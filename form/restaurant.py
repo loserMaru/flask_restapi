@@ -31,15 +31,15 @@ class RestaurantListResource(Resource):
 
 class RestaurantResource(Resource):
     @restaurantNS.marshal_with(restaurant_model)
-    def get(self, restaurant_id):
-        restaurant = Restaurant.query.filter_by(id=restaurant_id).first()
+    def get(self, id):
+        restaurant = Restaurant.query.filter_by(id=id).first()
         if not restaurant:
             restaurantNS.abort(404, 'Restaurant not found')
         return restaurant
 
     @restaurantNS.expect(restaurant_model)
-    def put(self, restaurant_id):
-        restaurant = Restaurant.query.filter_by(id=restaurant_id).first()
+    def put(self, id):
+        restaurant = Restaurant.query.filter_by(id=id).first()
         if not restaurant:
             restaurantNS.abort(404, 'Restaurant not found')
         for key, value in restaurantNS.payload.items():
@@ -47,8 +47,8 @@ class RestaurantResource(Resource):
         db.session.commit()
         return {'result': 'success'}
 
-    def delete(self, restaurant_id):
-        restaurant = Restaurant.query.filter_by(id=restaurant_id).first()
+    def delete(self, id):
+        restaurant = Restaurant.query.filter_by(id=id).first()
         if not restaurant:
             restaurantNS.abort(404, 'Restaurant not found')
         db.session.delete(restaurant)

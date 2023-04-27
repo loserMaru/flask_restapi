@@ -32,15 +32,15 @@ class ReservationListResource(Resource):
 # Определение ресурса для одного Reservation
 class ReservationResource(Resource):
     @reservationNS.marshal_with(reservation_model)
-    def get(self, reservation_id):
-        reservation = Reservation.query.filter_by(id=reservation_id).first()
+    def get(self, id):
+        reservation = Reservation.query.filter_by(id=id).first()
         if not reservation:
             reservationNS.abort(404, 'Reservation not found')
         return reservation
 
     @reservationNS.expect(reservation_model)
-    def put(self, reservation_id):
-        reservation = Reservation.query.filter_by(id=reservation_id).first()
+    def put(self, id):
+        reservation = Reservation.query.filter_by(id=id).first()
         if not reservation:
             reservationNS.abort(404, 'Reservation not found')
         reservation.day = reservationNS.payload['day']
@@ -51,8 +51,8 @@ class ReservationResource(Resource):
         db.session.commit()
         return {'result': 'success'}
 
-    def delete(self, reservation_id):
-        reservation = Reservation.query.filter_by(id=reservation_id).first()
+    def delete(self, id):
+        reservation = Reservation.query.filter_by(id=id).first()
         if not reservation:
             reservationNS.abort(404, 'Reservation not found')
         db.session.delete(reservation)

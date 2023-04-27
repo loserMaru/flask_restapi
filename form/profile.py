@@ -30,15 +30,15 @@ class ProfileResourceList(Resource):
 
 class ProfileResource(Resource):
     @profileNS.marshal_with(profile_model)
-    def get(self, profile_id):
-        profile = Profile.query.filter_by(id=profile_id).first()
+    def get(self, id):
+        profile = Profile.query.filter_by(id=id).first()
         if not profile:
             profileNS.abort(404, 'Profile not found')
         return profile
 
     @profileNS.expect(profile_model)
-    def put(self, profile_id):
-        profile = Profile.query.filter_by(id=profile_id).first()
+    def put(self, id):
+        profile = Profile.query.filter_by(id=id).first()
         if not profile:
             profileNS.abort(404, 'Profile not found')
         for key, value in profileNS.payload.items():
@@ -46,8 +46,8 @@ class ProfileResource(Resource):
         db.session.commit()
         return {'result': 'success'}
 
-    def delete(self, profile_id):
-        profile = Profile.query.filter_by(id=profile_id).first()
+    def delete(self, id):
+        profile = Profile.query.filter_by(id=id).first()
         if not profile:
             profileNS.abort(404, 'Profile not found')
         db.session.delete(profile)

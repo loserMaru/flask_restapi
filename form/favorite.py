@@ -27,22 +27,22 @@ class FavoriteResourceList(Resource):
 
 class FavoriteResource(Resource):
     @favoriteNS.marshal_with(favorite_model)
-    def get(self, favorite_id):
-        favorite = Favorite.query.filter_by(id=favorite_id).first()
+    def get(self, id):
+        favorite = Favorite.query.filter_by(id=id).first()
         if not favorite:
             favoriteNS.abort(404, 'Favorite not found')
         return favorite
 
     @favoriteNS.expect(favorite_model)
-    def put(self, favorite_id):
-        favorite = Favorite.query.filter_by(id=favorite_id).first()
+    def put(self, id):
+        favorite = Favorite.query.filter_by(id=id).first()
         for key, value in favoriteNS.payload.items():
             setattr(favorite, key, value)
         db.session.commit()
         return {'result': 'success'}
 
-    def delete(self, favorite_id):
-        favorite = Favorite.query.filter_by(id=favorite_id).first()
+    def delete(self, id):
+        favorite = Favorite.query.filter_by(id=id).first()
         if not favorite:
             favoriteNS.abort(404, 'Favorite not found')
         db.session.delete(favorite)

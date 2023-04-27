@@ -1,9 +1,8 @@
 from flask_restx import fields, Resource
 
 from extensions import db
-from extensions.flask_restx_extension import userNS
+from extensions.flask_restx_extension import userNS, api
 from models import User
-
 
 card_model = userNS.model('Card', {
     'id': fields.Integer(readonly=True),
@@ -28,7 +27,9 @@ class UserResourceList(Resource):
 
     @userNS.expect(user_model)
     def post(self):
-        user = User(**userNS.payload)
+        user = User(password=api.payload.get('password'),
+                    email=api.payload.get('email'),
+                    role=api.payload.get('role'))
         db.session.add(user)
         db.session.commit()
         return {'result': 'success'}
@@ -36,15 +37,15 @@ class UserResourceList(Resource):
 
 class UserResource(Resource):
     @userNS.marshal_with(user_model)
-    def get(self, user_id):
-        user = User.query.filter_by(id=user_id).first()
+    def get(self, id):
+        user = User.query.filter_by(id=id).first()
         if not user:
             userNS.abort(404, 'User not found')
         return user
 
     @userNS.expect(user_model)
-    def put(self, user_id):
-        user = User.query.filter_by(id=user_id).first()
+    def put(self, id):
+        user = User.query.filter_by(id=id).first()
         if not user:
             userNS.abort(404, 'User not found')
         user.password = userNS.payload['password']
@@ -53,8 +54,8 @@ class UserResource(Resource):
         db.session.commit()
         return {'result': 'success'}
 
-    def delete(self, user_id):
-        user = User.query.filter_by(id=user_id).first()
+    def delete(self, id):
+        user = User.query.filter_by(id=id).first()
         if not user:
             userNS.abort(404, 'User not found')
         db.session.delete(user)
