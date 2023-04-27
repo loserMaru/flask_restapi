@@ -2,8 +2,7 @@ from flask_restx import fields, Resource
 
 from extensions import api, db
 from extensions.flask_restx_extension import profileNS
-from models.models import Profile
-
+from models import Profile
 
 profile_model = profileNS.model('Profile', {
     'id': fields.Integer(readonly=True),
@@ -15,27 +14,43 @@ profile_model = profileNS.model('Profile', {
 
 
 class ProfileResourceList(Resource):
+    @api.doc(responses={
+        200: 'Успешный GET-запрос',
+        400: 'Некорректный запрос'
+    })
     @profileNS.marshal_list_with(profile_model)
     def get(self):
         profiles = Profile.query.all()
-        return profiles
+        return profiles, 200
 
+    @api.doc(responses={
+        201: 'Успешный POST-запрос, создание нового ресурса',
+        400: 'Некорректный запрос'
+    })
     @profileNS.expect(profile_model)
     def post(self):
         profile = Profile(**profileNS.payload)
         db.session.add(profile)
         db.session.commit()
-        return {'result': 'success'}
+        return profile, 201
 
 
 class ProfileResource(Resource):
+    @api.doc(responses={
+        200: 'Успешный GET-запрос',
+        404: 'Ресурс не найден'
+    })
     @profileNS.marshal_with(profile_model)
     def get(self, id):
         profile = Profile.query.filter_by(id=id).first()
         if not profile:
             profileNS.abort(404, 'Profile not found')
-        return profile
+        return profile, 200
 
+    @api.doc(responses={
+        200: 'Успешный PUT-запрос',
+        404: 'Ресурс не найден'
+    })
     @profileNS.expect(profile_model)
     def put(self, id):
         profile = Profile.query.filter_by(id=id).first()
@@ -44,12 +59,16 @@ class ProfileResource(Resource):
         for key, value in profileNS.payload.items():
             setattr(profile, key, value)
         db.session.commit()
-        return {'result': 'success'}
+        return profile.to_dict(), 200
 
+    @api.doc(responses={
+        204: 'Успешный DELETE-запрос, ресурс удален',
+        404: 'Ресурс не найден'
+    })
     def delete(self, id):
         profile = Profile.query.filter_by(id=id).first()
         if not profile:
             profileNS.abort(404, 'Profile not found')
         db.session.delete(profile)
         db.session.commit()
-        return {'result': 'success'}
+        return {'result': 'success'}, 204

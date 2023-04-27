@@ -1,10 +1,11 @@
 from flask_restx import Api
 
+# Namespaces
 api = Api(default='Мой столик', default_label='All operations')
-userNS = api.namespace('Users', description='Users operations')
-cardNS = api.namespace('Card', description='Card operations')
-profileNS = api.namespace('Profile', description='Profile operations')
-restaurantNS = api.namespace('Restaurant', description='Restaurant operations')
-reservationNS = api.namespace('Reservation', description='Reservation operations')
-favoriteNS = api.namespace('Favorite', description='Favorite operations')
-tableNS = api.namespace('Tables', description='Tables operations')
+userNS = api.namespace('Users', description='Users operations', path='/user')
+cardNS = api.namespace('Card', description='Card operations', path='/card')
+profileNS = api.namespace('Profile', description='Profile operations', path='/profile')
+restaurantNS = api.namespace('Restaurant', description='Restaurant operations', path='/restaurant')
+reservationNS = api.namespace('Reservation', description='Reservation operations', path='/reservation')
+favoriteNS = api.namespace('Favorite', description='Favorite operations', path='/favorite')
+tableNS = api.namespace('Tables', description='Tables operations', path='/table')
