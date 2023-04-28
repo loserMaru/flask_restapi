@@ -1,12 +1,14 @@
+from flask_bcrypt import Bcrypt
 from flask_restx import fields, Resource
+from flask import request
 
 from extensions import db
 from extensions.flask_restx_extension import userNS, api
 from models import User
 from schemas import UserSchema
-from marshmallow.exceptions import ValidationError
 
 user_schema = UserSchema()
+bcrypt = Bcrypt()
 
 card_model = userNS.model('Card', {
     'id': fields.Integer(readonly=True),
@@ -40,12 +42,15 @@ class UserResourceList(Resource):
     @userNS.expect(user_model)
     @userNS.marshal_with(user_model, code=201)
     def post(self):
-        user = User(password=api.payload.get('password'),
+        password = api.payload.get('password')
+        hashed_password = bcrypt.generate_password_hash(password).decode('utf-8')
+        user = User(password=hashed_password,
                     email=api.payload.get('email'),
-                    role=api.payload.get('role'))
+                    role=api.payload.get('role'),
+                    cards=[])
         db.session.add(user)
         db.session.commit()
-        return user.to_dict(), 201
+        return user_schema.dump(user), 201
 
 
 class UserResource(Resource):
