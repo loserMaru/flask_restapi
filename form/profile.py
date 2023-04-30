@@ -1,8 +1,11 @@
+from flask import request, jsonify
+
 from flask_restx import fields, Resource
 
 from extensions import api, db
 from extensions.flask_restx_extension import profileNS
 from models import Profile
+from schemas import profile_schema
 
 profile_model = profileNS.model('Profile', {
     'id': fields.Integer(readonly=True),
@@ -29,10 +32,19 @@ class ProfileResourceList(Resource):
     })
     @profileNS.expect(profile_model)
     def post(self):
-        profile = Profile(**profileNS.payload)
+        data = request.json
+        errors = profile_schema.validate(data)
+        if errors:
+            return jsonify(errors), 400
+        profile = Profile(
+            nickname=data['nickname'],
+            picture=data['picture'],
+            phone=data['phone'],
+            user_id=data['user_id']
+        )
         db.session.add(profile)
         db.session.commit()
-        return profile, 201
+        return profile_schema.dump(profile), 201
 
 
 class ProfileResource(Resource):

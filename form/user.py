@@ -1,11 +1,11 @@
 from flask_bcrypt import Bcrypt
 from flask_restx import fields, Resource
-from flask import request
 
 from extensions import db
 from extensions.flask_restx_extension import userNS, api
 from models import User
 from schemas import UserSchema
+from utils import hash_password
 
 user_schema = UserSchema()
 bcrypt = Bcrypt()
@@ -15,11 +15,11 @@ card_model = userNS.model('Card', {
     'cardNumber': fields.String,
     'user_id': fields.Integer,
 })
-
 user_model = userNS.model('User', {
     'id': fields.Integer(readonly=True),
-    'password': fields.String,
     'email': fields.String,
+    'password': fields.String,
+    'password_confirm': fields.String,
     'role': fields.String(default='user'),
     'cards': fields.Nested(card_model)
 })
@@ -43,14 +43,18 @@ class UserResourceList(Resource):
     @userNS.marshal_with(user_model, code=201)
     def post(self):
         password = api.payload.get('password')
-        hashed_password = bcrypt.generate_password_hash(password).decode('utf-8')
+        password_confirm = api.payload.get('password_confirm')
+        if password != password_confirm:
+            userNS.abort(400, 'Пароли не совпадают')
+        hashed_password = hash_password(password)
         user = User(password=hashed_password,
                     email=api.payload.get('email'),
                     role=api.payload.get('role'),
                     cards=[])
         db.session.add(user)
         db.session.commit()
-        return user_schema.dump(user), 201
+        result = user_schema.dump(user)
+        return result, 201
 
 
 class UserResource(Resource):
