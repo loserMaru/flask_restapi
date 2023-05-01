@@ -95,7 +95,7 @@ class UserResource(Resource):
         return user_schema.dump(user), 200
 
     @api.doc(responses={
-        204: 'Успешный DELETE-запрос, ресурс удален',
+        200: 'Успешный DELETE-запрос, ресурс удален',
         401: 'Неавторизованный доступ',
         404: 'Ресурс не найден'
     })
@@ -106,8 +106,7 @@ class UserResource(Resource):
         try:
             db.session.delete(user)
             db.session.commit()
-            return {'msg': 'User deleted'}
+            return {'msg': 'User deleted'}, 200
         except sqlalchemy.exc.IntegrityError as e:
             db.session.rollback()
-            return {'msg': 'Ошибка. У пользователя есть внешние ключи'}
-
+            return {'msg': 'Ошибка. У пользователя есть внешние ключи'}, 200
