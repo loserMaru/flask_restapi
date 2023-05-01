@@ -2,16 +2,16 @@ from flask import Flask
 
 from extensions import db, api, ma
 from extensions.flask_restx_extension import favoriteNS, profileNS, reservationNS, restaurantNS, tableNS
-from form.restaurant import RestaurantListResource, RestaurantResource
-from form.user import UserResource, UserResourceList, userNS
 from form.card import CardResource, CardResourceList, cardNS
 from form.favorite import FavoriteResource, FavoriteResourceList
 from form.profile import ProfileResource, ProfileResourceList
-from form.tables import TableResource, TableResourceList
 from form.reservation import ReservationResource, ReservationListResource
+from form.restaurant import RestaurantListResource, RestaurantResource
+from form.tables import TableResource, TableResourceList
+from form.user import UserResource, UserResourceList, userNS
 
 
-def register_resourse(api):
+def register_resource(api):
     #  User
     userNS.add_resource(UserResourceList, '')
     userNS.add_resource(UserResource, '/<int:id>')
@@ -59,7 +59,7 @@ def create_app():
     db.init_app(app)
     api.init_app(app)
     ma.init_app(app)
-    register_resourse(api)
+    register_resource(api)
     return app
 
 

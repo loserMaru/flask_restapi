@@ -1,9 +1,10 @@
 import json
 import re
 
+import sqlalchemy
+from flask import Response
 from flask_bcrypt import Bcrypt
 from flask_restx import fields, Resource
-from flask import request, jsonify, Response
 
 from extensions import db
 from extensions.flask_restx_extension import userNS, api
@@ -20,19 +21,12 @@ def is_valid_email(email):
     return re.match(pattern, email) is not None
 
 
-card_model = userNS.model('Card', {
-    'id': fields.Integer(readonly=True),
-    'cardNumber': fields.String,
-    'user_id': fields.Integer,
-})
-
 user_model = userNS.model('User', {
     'id': fields.Integer(readonly=True),
     'email': fields.String(default='string@gmail.com'),
     'password': fields.String,
     'confirm_password': fields.String,
     'role': fields.String(default='user'),
-    'cards': fields.Nested(card_model)
 })
 
 
@@ -41,7 +35,7 @@ class UserResourceList(Resource):
         200: 'Успешный GET-запрос',
         400: 'Некорректный запрос'
     })
-    @userNS.marshal_list_with(user_model)
+    @userNS.marshal_list_with(user_model, skip_none=True)
     def get(self):
         users = User.query.all()
         return users, 200
@@ -51,7 +45,7 @@ class UserResourceList(Resource):
         400: 'Некорректный запрос'
     })
     @userNS.expect(user_model)
-    @userNS.marshal_with(user_model, code=201)
+    @userNS.marshal_with(user_model, code=201, skip_none=True)
     def post(self):
         email = api.payload.get('email')
         if not is_valid_email(email):
@@ -77,7 +71,7 @@ class UserResource(Resource):
         200: 'Успешный GET-запрос',
         404: 'Ресурс не найден'
     })
-    @userNS.marshal_with(user_model)
+    @userNS.marshal_with(user_model, skip_none=True)
     def get(self, id):
         user = User.query.get(id)
         if not user:
@@ -88,12 +82,13 @@ class UserResource(Resource):
         200: 'Успешный PUT-запрос',
         404: 'Ресурс не найден'
     })
-    @userNS.expect(user_model)
+    @userNS.expect(user_model, skip_none=True)
     def put(self, id):
         user = User.query.filter_by(id=id).first()
         if not user:
             api.abort(404, 'User not found')
         user.password = userNS.payload['password']
+        user.password = bcrypt.generate_password_hash(user.password).decode('utf-8')
         user.email = userNS.payload['email']
         user.role = userNS.payload['role']
         db.session.commit()
@@ -104,11 +99,15 @@ class UserResource(Resource):
         401: 'Неавторизованный доступ',
         404: 'Ресурс не найден'
     })
-    @login_required
     def delete(self, id):
         user = User.query.get(id)
         if not user:
             api.abort(404, message='Пользователь с id {} не найден'.format(id))
-        db.session.delete(user)
-        db.session.commit()
-        return Response(json.dumps({'message': 'User deleted successfully'}), status=204, mimetype='application/json')
+        try:
+            db.session.delete(user)
+            db.session.commit()
+            return {'msg': 'User deleted'}
+        except sqlalchemy.exc.IntegrityError as e:
+            db.session.rollback()
+            return {'msg': 'Ошибка. У пользователя есть внешние ключи'}
+
