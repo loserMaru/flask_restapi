@@ -62,7 +62,7 @@ class UserResourceList(Resource):
             userNS.abort(400, 'Пароли не совпадают')
         hashed_password = bcrypt.generate_password_hash(password).decode('utf-8')
         user = User(password=hashed_password,
-                    email=api.payload.get('email'),
+                    email=email,
                     role=api.payload.get('role'),
                     cards=[])
         db.session.add(user)
