@@ -97,7 +97,6 @@ class Restaurant(db.Model):
     address = db.Column(db.String(255), nullable=False)
     picture = db.Column(db.String(255))
     hidden = db.Column(db.Boolean, nullable=False)
-    restaurantcol = db.Column(db.String(255))
 
     def to_dict(self):
         return {
@@ -106,7 +105,6 @@ class Restaurant(db.Model):
             'address': self.address,
             'picture': self.picture,
             'hidden': self.hidden,
-            'restaurantcol': self.restaurantcol
         }
 
 

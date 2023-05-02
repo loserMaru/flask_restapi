@@ -11,8 +11,7 @@ restaurant_model = restaurantNS.model('Restaurant', {
     'name': fields.String(required=True),
     'address': fields.String(required=True),
     'picture': fields.String(),
-    'hidden': fields.Boolean(required=True),
-    'restaurantcol': fields.String(),
+    'hidden': fields.Boolean(required=True)
 })
 
 restaurant_schema = RestaurantSchema()
@@ -49,7 +48,7 @@ class RestaurantResource(Resource):
     def get(self, id):
         restaurant = Restaurant.query.filter_by(id=id).first()
         if not restaurant:
-            restaurantNS.abort(404, 'Restaurant not found')
+            restaurantNS.abort(404, 'Ресторан не найден')
         return restaurant, 200
 
     @api.doc(responses={
@@ -66,18 +65,17 @@ class RestaurantResource(Resource):
         restaurant.address = data['address']
         restaurant.picture = data['picture']
         restaurant.hidden = data['hidden']
-        restaurant.restaurantcol = data['restaurantcol']
         db.session.commit()
         return restaurant_schema.dump(restaurant), 200
 
     @api.doc(responses={
-        204: 'Успешный DELETE-запрос, ресторан удален',
+        200: 'Успешный DELETE-запрос, ресторан удален',
         404: 'Ресторан не найден'
     })
     def delete(self, id):
         restaurant = Restaurant.query.filter_by(id=id).first()
         if not restaurant:
-            restaurantNS.abort(404, 'Restaurant not found')
+            restaurantNS.abort(404, 'Ресторан не найден')
         db.session.delete(restaurant)
         db.session.commit()
-        return {'result': 'success'}, 204
+        return {'msg': 'Ресторан удален успешно'}, 200

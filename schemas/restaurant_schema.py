@@ -7,4 +7,3 @@ class RestaurantSchema(Schema):
     address = fields.Str(required=True)
     picture = fields.Str()
     hidden = fields.Bool(required=True)
-    restaurantcol = fields.Str()
