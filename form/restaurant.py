@@ -4,7 +4,7 @@ from flask_restx import fields, Resource
 
 from extensions import api, db
 from extensions.flask_restx_extension import restaurantNS
-from models import Restaurant
+from models import Restaurant, Favorite, Reservation
 from schemas import RestaurantSchema
 
 restaurant_model = restaurantNS.model('Restaurant', {
@@ -78,10 +78,16 @@ class RestaurantResource(Resource):
         restaurant = Restaurant.query.filter_by(id=id).first()
         if not restaurant:
             restaurantNS.abort(404, 'Ресторан не найден')
+        favorites = Favorite.query.filter_by(restaurant_id=restaurant.id).all()
+        for favorite in favorites:
+            db.session.delete(favorite)
+        reservations = Reservation.query.filter_by(restaurant_id=restaurant.id).all()
+        for reservation in reservations:
+            db.session.delete(reservation)
         try:
             db.session.delete(restaurant)
             db.session.commit()
             return {'msg': 'Ресторан удален успешно'}, 200
         except sqlalchemy.exc.IntegrityError as e:
             db.session.rollback()
-            return {'msg': 'Ошибка. У ресторана есть внешние ключи'}, 400
+            return {'msg': 'Ошибка.'}, 400
