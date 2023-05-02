@@ -1,14 +1,14 @@
 from flask import Flask
 
 from extensions import db, api, ma
-from extensions.flask_restx_extension import favoriteNS, profileNS, reservationNS, restaurantNS, tableNS
-from form.card import CardResource, CardResourceList, cardNS
-from form.favorite import FavoriteResource, FavoriteResourceList
-from form.profile import ProfileResource, ProfileResourceList
-from form.reservation import ReservationResource, ReservationListResource
-from form.restaurant import RestaurantListResource, RestaurantResource
-from form.tables import TableResource, TableResourceList
-from form.user import UserResource, UserResourceList, userNS
+from extensions import favoriteNS, profileNS, reservationNS, restaurantNS, tableNS, cardNS, userNS
+from form import CardResource, CardResourceList
+from form import FavoriteResource, FavoriteResourceList
+from form import ProfileResource, ProfileResourceList
+from form import ReservationResource, ReservationListResource
+from form import RestaurantListResource, RestaurantResource
+from form import TableResource, TableResourceList
+from form import UserResource, UserResourceList
 
 
 def register_resource(api):
