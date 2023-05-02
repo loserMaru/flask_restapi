@@ -1,11 +1,12 @@
-from flask import request, jsonify
+import re
 
+from flask import request
 from flask_restx import fields, Resource
 
 from extensions import api, db
 from extensions.flask_restx_extension import profileNS
 from models import Profile
-from schemas import profile_schema
+from schemas import ProfileSchema
 
 profile_model = profileNS.model('Profile', {
     'id': fields.Integer(readonly=True),
@@ -14,6 +15,14 @@ profile_model = profileNS.model('Profile', {
     'phone': fields.String(required=True),
     'user_id': fields.Integer(required=True),
 })
+
+profile_schema = ProfileSchema()
+
+
+def num_is_valid(number):
+    """Проверка номера телефона на соответствие российскому формату"""
+    regex = r'^(\+7|7|8)?[\s\-]?\(?[489][0-9]{2}\)?[\s\-]?[0-9]{3}[\s\-]?[0-9]{2}[\s\-]?[0-9]{2}$'
+    return bool(re.match(regex, number))
 
 
 class ProfileResourceList(Resource):
@@ -33,9 +42,9 @@ class ProfileResourceList(Resource):
     @profileNS.expect(profile_model)
     def post(self):
         data = request.json
-        errors = profile_schema.validate(data)
-        if errors:
-            return jsonify(errors), 400
+        phone = profileNS.payload.get('phone')
+        if not num_is_valid(phone):
+            profileNS.abort(400, 'Неправильный номер телефона')
         profile = Profile(
             nickname=data['nickname'],
             picture=data['picture'],
@@ -56,7 +65,7 @@ class ProfileResource(Resource):
     def get(self, id):
         profile = Profile.query.filter_by(id=id).first()
         if not profile:
-            profileNS.abort(404, 'Profile not found')
+            profileNS.abort(404, 'Профиль не найден')
         return profile, 200
 
     @api.doc(responses={
@@ -67,20 +76,23 @@ class ProfileResource(Resource):
     def put(self, id):
         profile = Profile.query.filter_by(id=id).first()
         if not profile:
-            profileNS.abort(404, 'Profile not found')
+            profileNS.abort(404, 'Профиль не найден')
+        phone = profileNS.payload.get('phone')
+        if not num_is_valid(phone):
+            profileNS.abort(404, 'Неправильный номер телефона')
         for key, value in profileNS.payload.items():
             setattr(profile, key, value)
         db.session.commit()
         return profile.to_dict(), 200
 
     @api.doc(responses={
-        204: 'Успешный DELETE-запрос, ресурс удален',
+        200: 'Успешный DELETE-запрос, ресурс удален',
         404: 'Ресурс не найден'
     })
     def delete(self, id):
         profile = Profile.query.filter_by(id=id).first()
         if not profile:
-            profileNS.abort(404, 'Profile not found')
+            profileNS.abort(404, 'Профиль не найден')
         db.session.delete(profile)
         db.session.commit()
-        return {'result': 'success'}, 204
+        return {'msg': 'Профиль удален успешно'}, 200
