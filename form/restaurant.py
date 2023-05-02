@@ -1,3 +1,4 @@
+import sqlalchemy
 from flask import request
 from flask_restx import fields, Resource
 
@@ -70,12 +71,17 @@ class RestaurantResource(Resource):
 
     @api.doc(responses={
         200: 'Успешный DELETE-запрос, ресторан удален',
+        400: 'Некорректный запрос',
         404: 'Ресторан не найден'
     })
     def delete(self, id):
         restaurant = Restaurant.query.filter_by(id=id).first()
         if not restaurant:
             restaurantNS.abort(404, 'Ресторан не найден')
-        db.session.delete(restaurant)
-        db.session.commit()
-        return {'msg': 'Ресторан удален успешно'}, 200
+        try:
+            db.session.delete(restaurant)
+            db.session.commit()
+            return {'msg': 'Ресторан удален успешно'}, 200
+        except sqlalchemy.exc.IntegrityError as e:
+            db.session.rollback()
+            return {'msg': 'Ошибка. У ресторана есть внешние ключи'}, 400

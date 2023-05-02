@@ -47,8 +47,7 @@ class UserResourceList(Resource):
         hashed_password = bcrypt.generate_password_hash(password).decode('utf-8')
         user = User(password=hashed_password,
                     email=email,
-                    role=api.payload.get('role'),
-                    cards=[])
+                    role=api.payload.get('role'))
         db.session.add(user)
         db.session.commit()
         db.session.refresh(user)
@@ -96,7 +95,7 @@ class UserResource(Resource):
         try:
             db.session.delete(user)
             db.session.commit()
-            return {'msg': 'User deleted'}, 200
+            return {'msg': 'Пользователь удален'}, 200
         except sqlalchemy.exc.IntegrityError as e:
             db.session.rollback()
             return {'msg': 'Ошибка. У пользователя есть внешние ключи'}, 200
