@@ -1,10 +1,9 @@
-import re
-
 from flask import request
 from flask_restx import fields, Resource
 
 from extensions import api, db
 from extensions.flask_restx_extension import profileNS
+from form.validations import num_is_valid
 from models import Profile
 from schemas import ProfileSchema
 
@@ -17,12 +16,6 @@ profile_model = profileNS.model('Profile', {
 })
 
 profile_schema = ProfileSchema()
-
-
-def num_is_valid(number):
-    """Проверка номера телефона на соответствие российскому формату"""
-    regex = r'^(\+7|7|8)?[\s\-]?\(?[489][0-9]{2}\)?[\s\-]?[0-9]{3}[\s\-]?[0-9]{2}[\s\-]?[0-9]{2}$'
-    return bool(re.match(regex, number))
 
 
 class ProfileResourceList(Resource):

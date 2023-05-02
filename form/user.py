@@ -1,25 +1,15 @@
-import json
-import re
-
 import sqlalchemy
-from flask import Response
 from flask_bcrypt import Bcrypt
 from flask_restx import fields, Resource
 
 from extensions import db
 from extensions.flask_restx_extension import userNS, api
-from form.auth import login_required
+from form.validations import is_valid_email
 from models import User
 from schemas import UserSchema
 
 user_schema = UserSchema()
 bcrypt = Bcrypt()
-
-
-def is_valid_email(email):
-    pattern = r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$'
-    return re.match(pattern, email) is not None
-
 
 user_model = userNS.model('User', {
     'id': fields.Integer(readonly=True),
