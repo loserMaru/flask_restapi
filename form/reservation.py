@@ -1,7 +1,9 @@
 from datetime import datetime
+from sqlalchemy.exc import IntegrityError
+
 
 from flask import request, jsonify
-from flask_restx import Resource, fields, ValidationError
+from flask_restx import Resource, fields
 
 from extensions import api, db
 from extensions.flask_restx_extension import reservationNS
@@ -24,13 +26,17 @@ reservation_model = reservationNS.model('Reservation', {
 
 # Определение ресурса списка всех Reservation
 class ReservationListResource(Resource):
-    @api.doc(responses={200: 'Success', 404: 'Reservation not found'})
+    @api.doc(responses={
+        200: 'Успешный GET-запрос',
+        404: 'Бронь не найдена'})
     @reservationNS.marshal_list_with(reservation_model)
     def get(self):
         reservations = Reservation.query.all()
         return reservations, 200
 
-    @api.doc(responses={201: 'Created', 400: 'Invalid data'})
+    @api.doc(responses={
+        201: 'Успешный POST-запрос, объект создан',
+        400: 'Неверные данные'})
     @reservationNS.expect(reservation_model, validate=True)
     def post(self):
         data = request.json
@@ -52,37 +58,46 @@ class ReservationListResource(Resource):
 
 # Определение ресурса для одного Reservation
 class ReservationResource(Resource):
-    @api.doc(responses={200: 'Success', 404: 'Reservation not found'})
+    @api.doc(responses={
+        200: 'Успешный GET-запрос',
+        404: 'Бронь не найдена'})
     @reservationNS.marshal_with(reservation_model)
     def get(self, id):
         reservation = Reservation.query.filter_by(id=id).first()
         if not reservation:
-            reservationNS.abort(404, 'Reservation not found')
+            reservationNS.abort(404, 'Бронь не найдена')
         return reservation, 200
 
-    @api.doc(responses={200: 'Success', 400: 'Invalid data', 404: 'Reservation not found'})
-    @reservationNS.expect(reservation_model)
+    @api.doc(responses={
+        200: 'Успешный PUT-запрос',
+        400: 'Неверные данные',
+        404: 'Бронь не найдена'
+    })
+    @reservationNS.expect(reservation_model, validate=True)
     def put(self, id):
         reservation = Reservation.query.filter_by(id=id).first()
         if not reservation:
-            reservationNS.abort(404, 'Reservation not found')
-
+            reservationNS.abort(404, 'Бронь не найдена')
+        data = request.json
+        errors = reservation_schema.validate(data)
+        if errors:
+            return jsonify(errors), 400
         try:
-            reservation_data = reservation_schema.load(request.json, partial=True)
-        except ValidationError as err:
-            return jsonify(err.messages), 400
+            for field, value in data.items():
+                setattr(reservation, field, value)
+            db.session.commit()
+            return reservation_schema.dump(reservation), 200
+        except IntegrityError as e:
+            db.session.rollback()
+            return {'message': 'Ошибка сохранения в базу данных. Внешние ключи не должны быть равны 0'}, 400
 
-        for field, value in reservation_data.items():
-            setattr(reservation, field, value)
-
-        db.session.commit()
-        return reservation_schema.dump(reservation), 200
-
-    @api.doc(responses={200: 'Success', 404: 'Reservation not found'})
+    @api.doc(responses={
+        200: 'Успешный DELETE-запрос',
+        404: 'Бронь не найдена'})
     def delete(self, id):
         reservation = Reservation.query.filter_by(id=id).first()
         if not reservation:
-            reservationNS.abort(404, 'Reservation not found')
+            reservationNS.abort(404, 'Бронь не найдена')
         db.session.delete(reservation)
         db.session.commit()
-        return {'result': 'success'}, 200
+        return {'msg': 'Бронь удалена успешно'}, 200
