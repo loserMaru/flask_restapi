@@ -1,7 +1,7 @@
 from flask_restx import Api
 
 # Namespaces
-api = Api(default='Мой столик', default_label='All operations')
+api = Api(title='Мой Столик')
 userNS = api.namespace('Users', description='Users operations', path='/user')
 cardNS = api.namespace('Card', description='Card operations', path='/card')
 profileNS = api.namespace('Profile', description='Profile operations', path='/profile')

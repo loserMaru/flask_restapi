@@ -51,9 +51,13 @@ class ReservationListResource(Resource):
             user_id=data.get('user_id'),
             restaurant_id=data.get('restaurant_id')
         )
-        db.session.add(reservation)
-        db.session.commit()
-        return reservation_schema.dump(reservation), 201
+        try:
+            db.session.add(reservation)
+            db.session.commit()
+            return reservation_schema.dump(reservation), 201
+        except IntegrityError as e:
+            db.session.rollback()
+            return {'message': 'Ошибка сохранения в базу данных. Неверные внешние ключи'}, 400
 
 
 # Определение ресурса для одного Reservation
@@ -89,7 +93,7 @@ class ReservationResource(Resource):
             return reservation_schema.dump(reservation), 200
         except IntegrityError as e:
             db.session.rollback()
-            return {'message': 'Ошибка сохранения в базу данных. Внешние ключи не должны быть равны 0'}, 400
+            return {'message': 'Ошибка сохранения в базу данных. Неверные внешние ключи'}, 400
 
     @api.doc(responses={
         200: 'Успешный DELETE-запрос',
