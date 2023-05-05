@@ -13,9 +13,9 @@ bcrypt = Bcrypt()
 
 user_model = userNS.model('User', {
     'id': fields.Integer(readonly=True),
-    'email': fields.String(default='string@gmail.com'),
-    'password': fields.String,
-    'confirm_password': fields.String,
+    'email': fields.String(default='string@gmail.com', required=True),
+    'password': fields.String(required=True),
+    'confirm_password': fields.String(required=True),
     'role': fields.String(default='user'),
 })
 

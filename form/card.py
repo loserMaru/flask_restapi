@@ -10,7 +10,7 @@ from schemas import CardSchema
 card_model = cardNS.model('Card', {
     'id': fields.Integer(readonly=True),
     'cardNumber': fields.String(required=True),
-    'user_id': fields.Integer,
+    'user_id': fields.Integer(required=True),
 })
 
 card_schema = CardSchema()
