@@ -9,9 +9,9 @@ table_schema = TableSchema()
 
 table_model = tableNS.model('Table', {
     'id': fields.Integer(readonly=True),
-    'number': fields.String,
-    'seat': fields.String,
-    'restaurant_id': fields.Integer,
+    'number': fields.String(required=True),
+    'seat': fields.String(required=True),
+    'restaurant_id': fields.Integer(required=True),
 })
 
 

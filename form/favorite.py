@@ -11,8 +11,8 @@ favorite_schema = FavoriteSchema()
 
 favorite_model = favoriteNS.model('Favorite', {
     'id': fields.Integer(readonly=True),
-    'user_id': fields.Integer,
-    'restaurant_id': fields.Integer,
+    'user_id': fields.Integer(required=True),
+    'restaurant_id': fields.Integer(required=True),
 })
 
 
@@ -35,14 +35,13 @@ class FavoriteResourceList(Resource):
         data = request.json
         favorite = Favorite(user_id=data.get('user_id'),
                             restaurant_id=data.get('restaurant_id'))
-        print(favorite.to_dict())
         try:
             db.session.add(favorite)
             db.session.commit()
             return favorite_schema.dump(favorite), 201
         except IntegrityError as e:
             db.session.rollback()
-            return {'message': 'Ошибка сохранения в базу данных. Неверные внешние ключи'}, 400
+            return {'msg': 'Ошибка сохранения в базу данных. Неверные внешние ключи'}, 400
 
 
 class FavoriteResource(Resource):
@@ -73,7 +72,7 @@ class FavoriteResource(Resource):
             return favorite_schema.dump(favorite), 200
         except IntegrityError as e:
             db.session.rollback()
-            return {'message': 'Ошибка сохранения в базу данных. Неверные внешние ключи'}, 400
+            return {'msg': 'Ошибка сохранения в базу данных. Неверные внешние ключи'}, 400
 
     @api.doc(responses={
         200: 'Успешный DELETE-запрос, ресурс удален',

@@ -1,7 +1,6 @@
 from datetime import datetime
 from sqlalchemy.exc import IntegrityError
 
-
 from flask import request, jsonify
 from flask_restx import Resource, fields
 
@@ -16,11 +15,13 @@ reservations_schema = ReservationSchema(many=True)
 reservation_model = reservationNS.model('Reservation', {
     'id': fields.Integer(readonly=True),
     'day': fields.Date(required=True),
-    'time': fields.String(description='Time in HH:MM format', pattern='^(0[0-9]|1[0-9]|2[0-3]):[0-5][0-9]$'),
+    'time': fields.String(description='Time in HH:MM format',
+                          pattern='^(0[0-9]|1[0-9]|2[0-3]):[0-5][0-9]$',
+                          required=True),
     'number': fields.String(required=True),
     'name': fields.String(required=True),
-    'user_id': fields.Integer,
-    'restaurant_id': fields.Integer,
+    'user_id': fields.Integer(required=True),
+    'restaurant_id': fields.Integer(required=True),
 })
 
 
