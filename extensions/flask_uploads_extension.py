@@ -1,7 +1,7 @@
 import os
 
 ALLOWED_EXTENSIONS = set(['jpg', 'png', 'jpeg'])
-UPLOAD_FOLDER = 'static/upload'
+UPLOAD_FOLDER = os.environ.get('UPLOAD_FOLDER')
 if not os.path.exists(UPLOAD_FOLDER):
     os.makedirs(UPLOAD_FOLDER)
 

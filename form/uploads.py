@@ -1,40 +1,20 @@
-import os
+from flask import request
+from flask_restx import Resource
 
-from flask import request, jsonify
-from werkzeug.utils import secure_filename
+from form.imgbb_upload import upload_image_to_imgur
 
-from extensions.flask_uploads_extension import allowed_file
+client_id = '38987fafe27568b'
 
 
-def upload_file(app):
-    if 'files[]' not in request.files:
-        resp = jsonify({'message': 'No files were uploaded'})
-        resp.status_code = 400
-        return resp
+class UploadImage(Resource):
+    def post(self):
+        image = request.files['image']
+        image.save('temp_image.jpg')  # Сохраняем загруженное изображение временно на сервере
+        image_url = upload_image_to_imgur('temp_image.jpg', client_id)
+        # Удаление временного изображения, если требуется
+        # os.remove('temp_image.jpg')
 
-    files = request.files.getlist('files[]')
-
-    errors = {}
-    success = False
-
-    for file in files:
-        if file and allowed_file(file.filename):
-            filename = secure_filename(file.filename)
-            file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
-            success = True
+        if image_url:
+            return {'image_url': image_url}
         else:
-            errors[file.filename] = 'File type is not allowed'
-
-    if success and errors:
-        errors['message'] = 'file(s) successfully uploaded'
-        resp = jsonify(errors)
-        resp.status_code = 500
-        return resp
-    if success:
-        resp = jsonify({'message': 'File successfully uploaded'})
-        resp.status_code = 200
-        return resp
-    else:
-        resp = jsonify(errors)
-        resp.status_code = 500
-        return resp
+            return {'message': 'Image upload failed'}, 500
