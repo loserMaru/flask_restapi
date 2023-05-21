@@ -9,3 +9,4 @@ restaurantNS = api.namespace('Restaurant', description='Restaurant operations', 
 reservationNS = api.namespace('Reservation', description='Reservation operations', path='/reservation')
 favoriteNS = api.namespace('Favorite', description='Favorite operations', path='/favorite')
 tableNS = api.namespace('Tables', description='Tables operations', path='/table')
+uploadNS = api.namespace('Uploads', description='Uploads operations', path='/upload')

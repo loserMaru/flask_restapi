@@ -4,4 +4,4 @@ from extensions.flask_marshmallow_extension import ma
 
 # Namespaces
 
-from .flask_restx_extension import userNS, cardNS, tableNS, restaurantNS, reservationNS, profileNS, favoriteNS
+from .flask_restx_extension import userNS, cardNS, tableNS, restaurantNS, reservationNS, profileNS, favoriteNS, uploadNS
