@@ -1,6 +1,6 @@
 from flask import Flask
 
-from extensions import db, api, ma, uploadNS
+from extensions import db, api, ma, uploadNS, jwt
 from extensions import favoriteNS, profileNS, reservationNS, restaurantNS, tableNS, cardNS, userNS
 # from extensions.flask_uploads_extension import UPLOAD_FOLDER
 from form import CardResource, CardResourceList
@@ -10,6 +10,7 @@ from form import ReservationResource, ReservationListResource
 from form import RestaurantListResource, RestaurantResource
 from form import TableResource, TableResourceList
 from form import UserResource, UserResourceList
+from form.auth import UserLogin
 from form.uploads import UploadImage
 
 
@@ -17,6 +18,7 @@ def register_resource(api):
     #  User
     userNS.add_resource(UserResourceList, '')
     userNS.add_resource(UserResource, '/<int:id>')
+    userNS.add_resource(UserLogin, '/login')
     api.add_namespace(userNS, path='/user')
 
     # Card
@@ -55,6 +57,7 @@ def register_resource(api):
 
 
 def create_app():
+    # App configs
     app = Flask(__name__)
     app.config['SECRET_KEY'] = 'secret_key'
     app.config['JSON_AS_ASCII'] = False
@@ -64,15 +67,17 @@ def create_app():
     # Upload files
     app.config['MAX_CONTENT_LENGTH'] = 16 * 1024 * 1024
 
+    # Database
     app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+pymysql://root:4863826M@localhost/mystolik'
+
+    app.config['JWT_SECRET_KEY'] = 'super-secret-key'
+
+    # Inits
     db.init_app(app)
     api.init_app(app)
     ma.init_app(app)
+    jwt.init_app(app)
     register_resource(api)
-
-    # @app.route('/upload', methods=['POST'])
-    # def handle_update():
-    #     return upload_file()
 
     return app
 

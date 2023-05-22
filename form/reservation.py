@@ -1,8 +1,10 @@
 from datetime import datetime
-from sqlalchemy.exc import IntegrityError
 
 from flask import request, jsonify
+from flask_jwt_extended import jwt_required, get_jwt_identity
+from error_handlers import *
 from flask_restx import Resource, fields
+from sqlalchemy.exc import IntegrityError
 
 from extensions import api, db
 from extensions.flask_restx_extension import reservationNS
@@ -32,6 +34,7 @@ class ReservationListResource(Resource):
         200: 'Успешный GET-запрос',
         404: 'Бронь не найдена'})
     @reservationNS.marshal_list_with(reservation_model)
+    @jwt_required()
     def get(self):
         reservations = Reservation.query.all()
         return reservations, 200

@@ -1,24 +1,18 @@
-from flask_bcrypt import check_password_hash
-from functools import wraps
+from flask_jwt_extended import create_access_token
+from flask_restx import Resource
+from flask import request
 
-from flask import request, jsonify
-
+from extensions import userNS
 from models import User
 
 
-def authenticate(email, password):
-    user = User.query.filter_by(email=email).first()
-    if user and check_password_hash(user.password, password):
-        return user
-    return None
-
-
-def login_required(f):
-    @wraps(f)
-    def decorated_function(*args, **kwargs):
-        auth = request.authorization
-        if not auth or not authenticate(auth.username, auth.password):
-            return jsonify({'message': 'Unauthorized access'}), 401
-        return f(*args, **kwargs)
-
-    return decorated_function
+@userNS.route('/login', methods=['POST'])
+class UserLogin(Resource):
+    def post(self):
+        data = request.get_json()
+        user = User.query.filter_by(email=data['email']).first()
+        if user and user.check_password(data['password']):
+            access_token = create_access_token(identity=user.id)
+            return {'access_token': access_token}, 200
+        else:
+            return {'message': 'Invalid credentials'}, 401
