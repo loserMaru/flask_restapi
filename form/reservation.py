@@ -20,6 +20,7 @@ reservation_model = reservationNS.model('Reservation', {
                           required=True),
     'number': fields.String(required=True),
     'name': fields.String(required=True),
+    'price': fields.Float(required=True),
     'user_id': fields.Integer(required=True),
     'restaurant_id': fields.Integer(required=True),
 })
@@ -49,6 +50,7 @@ class ReservationListResource(Resource):
             time=data['time'],
             number=data['number'],
             name=data['name'],
+            price=data['price'],
             user_id=data.get('user_id'),
             restaurant_id=data.get('restaurant_id')
         )

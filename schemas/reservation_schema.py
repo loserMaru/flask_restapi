@@ -7,6 +7,7 @@ class ReservationSchema(Schema):
     time = fields.String(required=True)
     number = fields.String(required=True)
     name = fields.String(required=True)
+    price = fields.Float()
     user_id = fields.Integer()
     restaurant_id = fields.Integer()
 
