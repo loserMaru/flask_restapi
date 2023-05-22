@@ -1,6 +1,6 @@
 from flask import Flask
 
-from extensions import db, api, ma, uploadNS, jwt
+from extensions import db, api, ma, uploadNS, jwt, loginNS
 from extensions import favoriteNS, profileNS, reservationNS, restaurantNS, tableNS, cardNS, userNS
 # from extensions.flask_uploads_extension import UPLOAD_FOLDER
 from form import CardResource, CardResourceList
@@ -10,15 +10,17 @@ from form import ReservationResource, ReservationListResource
 from form import RestaurantListResource, RestaurantResource
 from form import TableResource, TableResourceList
 from form import UserResource, UserResourceList
-from form.auth import UserLogin
+from form.auth import Login
 from form.uploads import UploadImage
 
 
 def register_resource(api):
+    # Login
+    loginNS.add_resource(Login, '')
+    api.add_namespace(loginNS, path='/login')
     #  User
     userNS.add_resource(UserResourceList, '')
     userNS.add_resource(UserResource, '/<int:id>')
-    userNS.add_resource(UserLogin, '/login')
     api.add_namespace(userNS, path='/user')
 
     # Card

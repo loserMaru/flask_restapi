@@ -40,6 +40,8 @@ class UserResourceList(Resource):
         email = api.payload.get('email')
         if not is_valid_email(email):
             userNS.abort(400, 'Некорректный email')
+        if User.query.filter_by(email=email).first():
+            userNS.abort(400, 'Пользователь с таким email уже существует')
         password = api.payload.get('password')
         confirm_password = api.payload.get('confirm_password')
         if confirm_password != password or not confirm_password:
@@ -76,6 +78,9 @@ class UserResource(Resource):
         user = User.query.filter_by(id=id).first()
         if not user:
             api.abort(404, 'User not found')
+        email = userNS.payload.get('email')
+        if email != user.email and User.query.filter_by(email=email).first():
+            userNS.abort(400, 'Пользователь с таким email уже существует')
         user.password = userNS.payload['password']
         user.password = bcrypt.generate_password_hash(user.password).decode('utf-8')
         user.email = userNS.payload['email']
