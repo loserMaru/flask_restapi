@@ -1,7 +1,15 @@
 from flask_restx import Api
 
 # Namespaces
-api = Api(title='Мой Столик')
+api = Api(title='Мой Столик', version='1.0',
+          authorizations={
+              'Bearer Auth': {
+                  'type': 'apiKey',
+                  'in': 'header',
+                  'name': 'Авторизация'
+              }
+          })
+
 loginNS = api.namespace('Login', description='Login operations', path='/login')
 authNS = api.namespace('Auth', description='Authorization', path='/auth')
 userNS = api.namespace('Users', description='Users operations', path='/user')

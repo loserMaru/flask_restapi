@@ -78,7 +78,10 @@ def create_app():
     # Database
     app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+pymysql://root:4863826M@localhost/mystolik'
 
+    # JWT Token
     app.config['JWT_SECRET_KEY'] = 'super-secret-key'
+    app.config['JWT_HEADER_NAME'] = 'Authorization'
+    app.config['JWT_HEADER_TYPE'] = 'Bearer'
 
     # Inits
     db.init_app(app)

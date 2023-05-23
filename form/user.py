@@ -1,6 +1,8 @@
 import sqlalchemy
 from flask_bcrypt import Bcrypt
+from flask_jwt_extended import jwt_required
 from flask_restx import fields, Resource
+from werkzeug import security
 
 from extensions import db
 from extensions.flask_restx_extension import userNS, api
@@ -30,10 +32,12 @@ class UserResourceList(Resource):
         users = User.query.all()
         return users, 200
 
+    @userNS.doc(security='jwt')
     @api.doc(responses={
         201: 'Успешный POST-запрос, создание нового ресурса',
         400: 'Некорректный запрос'
     })
+    @jwt_required()
     @userNS.expect(user_model)
     @userNS.marshal_with(user_model, code=201, skip_none=True)
     def post(self):
