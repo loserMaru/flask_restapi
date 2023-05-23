@@ -3,10 +3,11 @@ from flask_restx import Api
 # Namespaces
 api = Api(title='Мой Столик', version='1.0',
           authorizations={
-              'Bearer Auth': {
+              'jwt': {
                   'type': 'apiKey',
                   'in': 'header',
-                  'name': 'Авторизация'
+                  'name': 'Authorization',
+                  'description': 'JWT authorization, e.g. "Bearer {token}"'
               }
           })
 
