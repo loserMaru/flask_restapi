@@ -4,8 +4,6 @@ from flask import request
 from flask_restx import Resource
 from imgurpython import ImgurClient
 
-client_id = '38987fafe27568b'
-
 
 class UploadImage(Resource):
     def post(self):

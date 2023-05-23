@@ -1,5 +1,6 @@
 from flask import request
-from flask_restx import fields, Resource
+from flask_restx import fields, Resource, reqparse, inputs
+# from werkzeug.datastructures import FileStorage
 
 from extensions import api, db
 from extensions.flask_restx_extension import profileNS
@@ -17,6 +18,12 @@ profile_model = profileNS.model('Profile', {
 
 profile_schema = ProfileSchema()
 
+# upload_parser = reqparse.RequestParser()
+# upload_parser.add_argument('image', type=FileStorage, location='files', required=True, help='Image file (required)')
+# upload_parser.add_argument('nickname', type=str, required=True, help='Nickname (required)')
+# upload_parser.add_argument('phone', type=str, required=True, help='Phone number (required)')
+# upload_parser.add_argument('user_id', type=int, required=True, help='User ID (required)')
+
 
 class ProfileResourceList(Resource):
     @api.doc(responses={
@@ -33,8 +40,10 @@ class ProfileResourceList(Resource):
         400: 'Некорректный запрос'
     })
     @profileNS.expect(profile_model)
+    # @profileNS.expect(upload_parser)
     def post(self):
         data = request.json
+        # image = request.files.get('picture')
         phone = profileNS.payload.get('phone')
         if not num_is_valid(phone):
             profileNS.abort(400, 'Неправильный номер телефона')
