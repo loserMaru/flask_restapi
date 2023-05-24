@@ -1,11 +1,12 @@
 from datetime import datetime, timedelta
 
+import jwt
 from flask import request
 from flask_bcrypt import check_password_hash
 from flask_jwt_extended import create_access_token
 from flask_restx import Resource, reqparse, fields
 
-from extensions import loginNS, jwt
+from extensions import loginNS
 from extensions.flask_restx_extension import authNS
 from form.validations import is_valid_email, password_is_valid, verify_password
 from models import User

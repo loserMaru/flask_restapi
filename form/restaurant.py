@@ -10,7 +10,7 @@ from schemas import RestaurantSchema
 restaurant_model = restaurantNS.model('Restaurant', {
     'id': fields.Integer(readonly=True),
     'name': fields.String(required=True),
-    'address': fields.String(required=True),
+    'description': fields.String(required=True),
     'picture': fields.String(),
     'price': fields.Float(required=True),
     'hidden': fields.Boolean(required=True, default=False)
@@ -64,7 +64,7 @@ class RestaurantResource(Resource):
             restaurantNS.abort(404, 'Ресторан не найден')
         data = restaurant_schema.load(request.get_json())
         restaurant.name = data['name']
-        restaurant.address = data['address']
+        restaurant.address = data['description']
         restaurant.picture = data['picture']
         restaurant.price = data['price']
         restaurant.hidden = data['hidden']

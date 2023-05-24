@@ -6,7 +6,7 @@ from werkzeug import security
 
 from extensions import db
 from extensions.flask_restx_extension import userNS, api
-from form.validations import is_valid_email
+from form.validations import is_valid_email, password_is_valid
 from models import User
 from schemas import UserSchema
 
@@ -47,6 +47,8 @@ class UserResourceList(Resource):
         if User.query.filter_by(email=email).first():
             userNS.abort(400, 'Пользователь с таким email уже существует')
         password = api.payload.get('password')
+        if password_is_valid(password):
+            userNS.abort(400, 'Пароль должен содержать минимум 8 символов')
         confirm_password = api.payload.get('confirm_password')
         if confirm_password != password or not confirm_password:
             userNS.abort(400, 'Пароли не совпадают')
