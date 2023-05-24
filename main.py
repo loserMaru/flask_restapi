@@ -76,6 +76,11 @@ def create_app():
     app.config['MAX_CONTENT_LENGTH'] = 16 * 1024 * 1024
 
     # Database
+    # DB_USERNAME = 'loserMaru'
+    # DB_PASSWORD = '4863826M'
+    # DB_HOST = 'loserMaru.mysql.pythonanywhere-services.com'
+    # DB_NAME = 'loserMaru$mytable'
+    # app.config['SQLALCHEMY_DATABASE_URI'] = f'mysql+pymysql://{DB_USERNAME}:{DB_PASSWORD}@{DB_HOST}/{DB_NAME}'
     app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+pymysql://root:4863826M@localhost/mystolik'
 
     # JWT Token
