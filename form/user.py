@@ -32,7 +32,6 @@ class UserResourceList(Resource):
         users = User.query.all()
         return users, 200
 
-    @userNS.doc(security='jwt')
     @api.doc(responses={
         201: 'Успешный POST-запрос, создание нового ресурса',
         400: 'Некорректный запрос'
@@ -46,7 +45,7 @@ class UserResourceList(Resource):
         if User.query.filter_by(email=email).first():
             userNS.abort(400, 'Пользователь с таким email уже существует')
         password = api.payload.get('password')
-        if password_is_valid(password):
+        if not password_is_valid(password):
             userNS.abort(400, 'Пароль должен содержать минимум 8 символов')
         confirm_password = api.payload.get('confirm_password')
         if confirm_password != password or not confirm_password:
