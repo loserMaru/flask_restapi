@@ -13,6 +13,7 @@ colorama==0.4.6
 cryptography==40.0.2
 Flask==2.2.3
 Flask-Bcrypt==1.0.1
+Flask-JWT-Extended==4.4.4
 Flask-Login==0.6.2
 flask-marshmallow==0.15.0
 flask-restx==1.1.0
@@ -33,6 +34,7 @@ marshmallow-sqlalchemy==0.29.0
 multidict==6.0.4
 packaging==23.1
 pycparser==2.21
+PyJWT==2.7.0
 PyMySQL==1.0.3
 pyrsistent==0.19.3
 pytz==2023.3

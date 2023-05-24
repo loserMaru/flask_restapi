@@ -37,7 +37,6 @@ class UserResourceList(Resource):
         201: 'Успешный POST-запрос, создание нового ресурса',
         400: 'Некорректный запрос'
     })
-    @jwt_required()
     @userNS.expect(user_model)
     @userNS.marshal_with(user_model, code=201, skip_none=True)
     def post(self):
