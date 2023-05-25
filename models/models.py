@@ -98,7 +98,9 @@ class Restaurant(db.Model):
     description = db.Column(db.String(255), nullable=False)
     picture = db.Column(db.String(255))
     price = db.Column(db.Float(), nullable=False)
-    hidden = db.Column(db.Boolean, nullable=False)
+    star = db.Column(db.Float(), nullable=False)
+    tableCount = db.Column(db.Integer(), nullable=False)
+    cat_id = db.Column(db.Integer(), nullable=False)
 
     def to_dict(self):
         return {
@@ -107,7 +109,9 @@ class Restaurant(db.Model):
             'description': self.address,
             'picture': self.picture,
             'price': self.price,
-            'hidden': self.hidden,
+            'star': self.star,
+            'tableCount': self.tableCount,
+            'cat_id': self.cat_id,
         }
 
 

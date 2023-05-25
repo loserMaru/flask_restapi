@@ -4,8 +4,11 @@ from flask import request
 from flask_restx import Resource
 from imgurpython import ImgurClient
 
+from extensions import uploadNS
+
 
 class UploadImage(Resource):
+    @uploadNS.expect(uploadNS.parser().add_argument('image', location='files', type='file'))
     def post(self):
         client_id = '7ac7ce010e34893'
         client_secret = '9d2d06f3d8801a800ebf8411f69e898eb667d779'

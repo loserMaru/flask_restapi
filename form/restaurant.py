@@ -13,7 +13,9 @@ restaurant_model = restaurantNS.model('Restaurant', {
     'description': fields.String(required=True),
     'picture': fields.String(),
     'price': fields.Float(required=True),
-    'hidden': fields.Boolean(required=True, default=False)
+    'star': fields.Float(required=True, default=False),
+    'tableCount': fields.Integer(required=True),
+    'cat_id': fields.Integer(required=True)
 })
 
 restaurant_schema = RestaurantSchema()
@@ -67,7 +69,9 @@ class RestaurantResource(Resource):
         restaurant.address = data['description']
         restaurant.picture = data['picture']
         restaurant.price = data['price']
-        restaurant.hidden = data['hidden']
+        restaurant.star = data['star']
+        restaurant.tableCount = data['tableCount']
+        restaurant.cat_id = data['cat_id']
         db.session.commit()
         return restaurant_schema.dump(restaurant), 200
 
