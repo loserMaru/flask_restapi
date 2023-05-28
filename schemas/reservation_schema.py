@@ -7,12 +7,13 @@ class ReservationSchema(Schema):
     time = fields.String(required=True)
     number = fields.String(required=True)
     name = fields.String(required=True)
-    price = fields.Float()
+    price = fields.Float(required=True)
+    status = fields.Boolean(required=True)
     user_id = fields.Integer()
     restaurant_id = fields.Integer()
 
     class Meta:
-        fields = ('id', 'day', 'time', 'number', 'name', 'user_id', 'restaurant_id')
+        fields = ('id', 'day', 'time', 'number', 'name', 'status', 'user_id', 'restaurant_id')
         load_instance = True
         unknown = EXCLUDE
 

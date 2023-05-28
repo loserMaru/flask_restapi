@@ -4,9 +4,10 @@ from flask_restx import fields, Resource
 from flask import request
 
 from extensions import loginNS, jwt
-from extensions.flask_restx_extension import authWebNS
+from extensions.flask_restx_extension import authWebNS, api, reservationNS
+from form.reservation import reservation_model
 from form.validations import is_valid_email, password_is_valid, verify_password
-from models import User
+from models import User, Reservation
 
 login_model = loginNS.model('Login', {
     'email': fields.String(required=True, default='string@gmail.com'),
@@ -38,11 +39,12 @@ class WebAuthResource(Resource):
         if user.role != 'restaurant':
             authWebNS.abort(401, 'Неподходящая роль')
 
-        # Generate JWT token
-        # payload = {
-        #     'user_id': user.id,
-        #     'exp': datetime.utcnow() + timedelta(days=1)
-        # }
-        # token = jwt.encode(payload, JWT_SECRET_KEY, algorithm='HS256')
-
         return {'message': 'Успешный вход'}, 200
+
+    @api.doc(responses={
+        200: 'Успешный GET-запрос',
+        404: 'Бронь не найдена'})
+    @reservationNS.marshal_list_with(reservation_model)
+    def get(self):
+        reservations = Reservation.query.filter_by(status=1).all()
+        return [{"id": r.id, "name": r.name} for r in reservations], 200

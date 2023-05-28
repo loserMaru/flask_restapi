@@ -1,7 +1,6 @@
 from datetime import datetime
 
 from flask import request, jsonify
-from flask_jwt_extended import jwt_required, get_jwt_identity
 from error_handlers import *
 from flask_restx import Resource, fields
 from sqlalchemy.exc import IntegrityError
@@ -23,6 +22,7 @@ reservation_model = reservationNS.model('Reservation', {
     'number': fields.String(required=True),
     'name': fields.String(required=True),
     'price': fields.Float(required=True),
+    'status': fields.Boolean(required=True, default='false'),
     'user_id': fields.Integer(required=True),
     'restaurant_id': fields.Integer(required=True),
 })
@@ -34,7 +34,6 @@ class ReservationListResource(Resource):
         200: 'Успешный GET-запрос',
         404: 'Бронь не найдена'})
     @reservationNS.marshal_list_with(reservation_model)
-    @jwt_required()
     def get(self):
         reservations = Reservation.query.all()
         return reservations, 200
@@ -54,6 +53,7 @@ class ReservationListResource(Resource):
             number=data['number'],
             name=data['name'],
             price=data['price'],
+            status=data['status'],
             user_id=data.get('user_id'),
             restaurant_id=data.get('restaurant_id')
         )
