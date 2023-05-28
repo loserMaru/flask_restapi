@@ -13,6 +13,7 @@ api = Api(title='Мой Столик', version='1.0',
 
 loginNS = api.namespace('Login', description='Login operations', path='/login')
 authNS = api.namespace('Auth', description='Authorization', path='/auth')
+authWebNS = api.namespace('Web auth', description='Web auth', path='/webauth')
 userNS = api.namespace('Users', description='Users operations', path='/user')
 cardNS = api.namespace('Card', description='Card operations', path='/card')
 profileNS = api.namespace('Profile', description='Profile operations', path='/profile')

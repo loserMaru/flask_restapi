@@ -2,7 +2,7 @@ from flask import Flask
 
 from extensions import db, api, ma, uploadNS, jwt, loginNS
 from extensions import favoriteNS, profileNS, reservationNS, restaurantNS, tableNS, cardNS, userNS
-from extensions.flask_restx_extension import authNS
+from extensions.flask_restx_extension import authNS, authWebNS
 # from extensions.flask_uploads_extension import UPLOAD_FOLDER
 from form import CardResource, CardResourceList
 from form import FavoriteResource, FavoriteResourceList
@@ -11,7 +11,8 @@ from form import ReservationResource, ReservationListResource
 from form import RestaurantListResource, RestaurantResource
 from form import TableResource, TableResourceList
 from form import UserResource, UserResourceList
-from form.auth import Login, AuthResource
+from form.auth import AuthResource
+from form.authweb import WebAuthResource
 from form.uploads import UploadImage
 
 
@@ -20,9 +21,13 @@ def register_resource(api):
     authNS.add_resource(AuthResource, '')
     api.add_namespace(authNS, path='/auth')
 
+    # Web Auth
+    authWebNS.add_resource(WebAuthResource, '')
+    api.add_namespace(authWebNS, path='/webauth')
+
     # Login
-    loginNS.add_resource(Login, '')
-    api.add_namespace(loginNS, path='/login')
+    # loginNS.add_resource(Login, '')
+    # api.add_namespace(loginNS, path='/login')
 
     #  User
     userNS.add_resource(UserResourceList, '')
