@@ -12,7 +12,7 @@ from form import RestaurantListResource, RestaurantResource
 from form import TableResource, TableResourceList
 from form import UserResource, UserResourceList
 from form.auth import AuthResource
-from form.authweb import WebAuthResource
+from form.authweb import WebAuthResource, ReservationStatusOne
 from form.uploads import UploadImage
 
 
@@ -23,7 +23,8 @@ def register_resource(api):
 
     # Web Auth
     authWebNS.add_resource(WebAuthResource, '')
-    api.add_namespace(authWebNS, path='/webauth')
+    authWebNS.add_resource(ReservationStatusOne, '/one')
+    api.add_namespace(authWebNS, path='/web')
 
     # Login
     # loginNS.add_resource(Login, '')

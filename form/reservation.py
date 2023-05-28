@@ -12,13 +12,12 @@ from schemas import ReservationSchema
 
 reservation_schema = ReservationSchema()
 reservations_schema = ReservationSchema(many=True)
+#  pattern='^(0[0-9]|1[0-9]|2[0-3]):[0-5][0-9]$',                         for time in model
 
 reservation_model = reservationNS.model('Reservation', {
     'id': fields.Integer(readonly=True),
     'day': fields.Date(required=True),
-    'time': fields.String(description='Time in HH:MM format',
-                          pattern='^(0[0-9]|1[0-9]|2[0-3]):[0-5][0-9]$',
-                          required=True),
+    'time': fields.String(description='Time in HH:MM format', required=True),
     'number': fields.String(required=True),
     'name': fields.String(required=True),
     'price': fields.Float(required=True),
