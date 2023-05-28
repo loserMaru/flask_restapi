@@ -41,14 +41,6 @@ class WebAuthResource(Resource):
 
         return {'message': 'Успешный вход'}, 200
 
-    @api.doc(responses={
-        200: 'Успешный GET-запрос',
-        404: 'Бронь не найдена'})
-    @reservationNS.marshal_list_with(reservation_model)
-    def get(self):
-        reservations = Reservation.query.filter_by(status=0).all()
-        return [{"id": r.id, "name": r.name} for r in reservations], 200
-
 
 class ReservationStatusOne(Resource):
     @api.doc(responses={
@@ -56,5 +48,15 @@ class ReservationStatusOne(Resource):
         404: 'Бронь не найдена'})
     @reservationNS.marshal_list_with(reservation_model)
     def get(self):
-        reservations = Reservation.query.filter_by(status=1).all()
-        return [{"id": r.id, "name": r.name} for r in reservations], 200
+        reservations = Reservation.query.filter_by(status=True).all()
+        return reservations, 200
+
+
+class ReservationStatusZero(Resource):
+    @api.doc(responses={
+        200: 'Успешный GET-запрос',
+        404: 'Бронь не найдена'})
+    @reservationNS.marshal_list_with(reservation_model)
+    def get(self):
+        reservations = Reservation.query.filter_by(status=False).all()
+        return reservations, 200
