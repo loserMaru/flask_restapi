@@ -108,3 +108,16 @@ class UserResource(Resource):
         except sqlalchemy.exc.IntegrityError as e:
             db.session.rollback()
             return {'msg': 'Ошибка. У пользователя есть внешние ключи'}, 200
+
+
+class UserEmailResource(Resource):
+    @api.doc(responses={
+        200: 'Успешный GET-запрос',
+        400: 'Некорректный запрос'
+    })
+    @userNS.marshal_list_with(user_model, skip_none=True)
+    def get(self, email):
+        user = User.query.filter_by(email=email).first()
+        if not user:
+            api.abort(404, 'User not found')
+        return user, 200

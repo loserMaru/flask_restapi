@@ -14,6 +14,7 @@ from form import UserResource, UserResourceList
 from form.auth import AuthResource
 from form.authweb import WebAuthResource, ReservationStatusOne, ReservationStatusZero
 from form.uploads import UploadImage
+from form.user import UserEmailResource
 
 
 def register_resource(api):
@@ -34,6 +35,7 @@ def register_resource(api):
     #  User
     userNS.add_resource(UserResourceList, '')
     userNS.add_resource(UserResource, '/<int:id>')
+    userNS.add_resource(UserEmailResource, '/<string:email>')
     api.add_namespace(userNS, path='/user')
 
     # Card
