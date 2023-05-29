@@ -13,6 +13,7 @@ from form import TableResource, TableResourceList
 from form import UserResource, UserResourceList
 from form.auth import AuthResource
 from form.authweb import WebAuthResource, ReservationStatusOne, ReservationStatusZero
+from form.profile import UploadProfilePic
 from form.uploads import UploadImage
 from form.user import UserEmailResource
 
@@ -46,6 +47,7 @@ def register_resource(api):
     # Profile
     profileNS.add_resource(ProfileResourceList, '')
     profileNS.add_resource(ProfileResource, '/<int:id>')
+    profileNS.add_resource(UploadProfilePic, '/upload/<int:id>')
     api.add_namespace(profileNS, path='/profile')
 
     # Reservation

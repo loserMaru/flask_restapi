@@ -1,12 +1,16 @@
+import os
+
 from flask import request
-from flask_restx import fields, Resource, reqparse, inputs
-# from werkzeug.datastructures import FileStorage
+from flask_restx import fields, Resource
+from imgurpython import ImgurClient
 
 from extensions import api, db
 from extensions.flask_restx_extension import profileNS
 from form.validations import num_is_valid
 from models import Profile
 from schemas import ProfileSchema
+
+# from werkzeug.datastructures import FileStorage
 
 profile_model = profileNS.model('Profile', {
     'id': fields.Integer(readonly=True),
@@ -17,6 +21,7 @@ profile_model = profileNS.model('Profile', {
 })
 
 profile_schema = ProfileSchema()
+
 
 # upload_parser = reqparse.RequestParser()
 # upload_parser.add_argument('image', type=FileStorage, location='files', required=True, help='Image file (required)')
@@ -98,3 +103,41 @@ class ProfileResource(Resource):
         db.session.delete(profile)
         db.session.commit()
         return {'msg': 'Профиль удален успешно'}, 200
+
+
+class UploadProfilePic(Resource):
+    @profileNS.expect(profileNS.parser().add_argument('image', location='files', type='file'))
+    def put(self, id):
+        profile = Profile.query.filter_by(id=id).first()
+        if not profile:
+            profileNS.abort(404, 'Профиль не найден')
+
+        client_id = '7ac7ce010e34893'
+        client_secret = '9d2d06f3d8801a800ebf8411f69e898eb667d779'
+
+        client = ImgurClient(client_id, client_secret)
+
+        image = request.files.get('image')
+        print(image)
+        if not image:
+            return {'message': 'No image uploaded'}, 400
+
+        # Save the image to a temporary directory
+        temp_dir = os.path.join(os.getcwd(), 'temp')
+        if not os.path.exists(temp_dir):
+            os.makedirs(temp_dir)
+        image_path = os.path.join(temp_dir, image.filename)
+        image.save(image_path)
+
+        # Upload the image to imgur
+        response = client.upload_from_path(image_path)
+
+        # Remove the temporary file
+        os.remove(image_path)
+
+        # Update profile picture
+        profile.picture = response['link']
+        db.session.commit()
+
+        return profile_schema.dump(profile), 201
+
