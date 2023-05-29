@@ -1,13 +1,12 @@
 from datetime import datetime
 
 from flask import request, jsonify
-from error_handlers import *
 from flask_restx import Resource, fields
 from sqlalchemy.exc import IntegrityError
 
 from extensions import api, db
 from extensions.flask_restx_extension import reservationNS
-from models import Reservation
+from models import Reservation, User
 from schemas import ReservationSchema
 
 reservation_schema = ReservationSchema()
@@ -22,6 +21,7 @@ reservation_model = reservationNS.model('Reservation', {
     'name': fields.String(required=True),
     'price': fields.Float(required=True),
     'status': fields.Boolean(required=True, default='false'),
+    'picture': fields.String(required=True),
     'user_id': fields.Integer(required=True),
     'restaurant_id': fields.Integer(required=True),
 })
@@ -46,6 +46,14 @@ class ReservationListResource(Resource):
         errors = reservation_schema.validate(data)
         if errors:
             return jsonify(errors), 400
+        if isinstance(data['user_id'], str):
+            # Try to find a user by email and set their id as user_id
+            email = data['user_id']
+            user = User.query.filter_by(email=email).first()
+            if user:
+                data['user_id'] = user.id
+            else:
+                return {'message': f'Пользователь с e-mail {email} не найден'}, 400
         reservation = Reservation(
             day=datetime.strptime(data['day'], '%Y-%m-%d').date(),
             time=data['time'],
@@ -53,7 +61,8 @@ class ReservationListResource(Resource):
             name=data['name'],
             price=data['price'],
             status=data['status'],
-            user_id=data.get('user_id'),
+            picture=data['picture'],
+            user_id=data['user_id'],
             restaurant_id=data.get('restaurant_id')
         )
         try:

@@ -1,9 +1,9 @@
 from flask import Flask
+from flask_cors import CORS
 
 from extensions import db, api, ma, uploadNS, jwt, loginNS
 from extensions import favoriteNS, profileNS, reservationNS, restaurantNS, tableNS, cardNS, userNS
 from extensions.flask_restx_extension import authNS, authWebNS
-# from extensions.flask_uploads_extension import UPLOAD_FOLDER
 from form import CardResource, CardResourceList
 from form import FavoriteResource, FavoriteResourceList
 from form import ProfileResource, ProfileResourceList
@@ -104,6 +104,7 @@ def create_app():
     api.init_app(app)
     ma.init_app(app)
     jwt.init_app(app)
+    CORS(app, origins='*')
     register_resource(api)
 
     return app

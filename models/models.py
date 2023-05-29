@@ -75,6 +75,7 @@ class Reservation(db.Model):
     name = db.Column(db.String(255), nullable=False)
     price = db.Column(db.Float(), nullable=False)
     status = db.Column(db.Boolean(), nullable=False)
+    picture = db.Column(db.String(255))
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
     restaurant_id = db.Column(db.Integer, db.ForeignKey('restaurant.id'), nullable=False)
     user = db.relationship('User', backref='reservations')
@@ -87,6 +88,9 @@ class Reservation(db.Model):
             'time': self.time,
             'number': self.number,
             'name': self.name,
+            'price': self.price,
+            'status': self.status,
+            'picture': self.picture,
             'user_id': self.user_id,
             'restaurant_id': self.restaurant_id
         }

@@ -18,6 +18,10 @@ JWT_SECRET_KEY = 'super-secret-key'
 
 
 class WebAuthResource(Resource):
+    @api.doc(responses={
+        200: 'Успешный GET-запрос',
+        400: 'Некорректный запрос'
+    })
     @authWebNS.expect(login_model)
     def post(self):
         data = request.json

@@ -33,11 +33,11 @@ class UserResourceList(Resource):
         return users, 200
 
     @api.doc(responses={
-        201: 'Успешный POST-запрос, создание нового ресурса',
+        200: 'Успешный POST-запрос, создание нового ресурса',
         400: 'Некорректный запрос'
     })
     @userNS.expect(user_model)
-    @userNS.marshal_with(user_model, code=201, skip_none=True)
+    @userNS.marshal_with(user_model, code=200, skip_none=True)
     def post(self):
         email = api.payload.get('email')
         if not is_valid_email(email):
@@ -58,7 +58,7 @@ class UserResourceList(Resource):
         db.session.commit()
         db.session.refresh(user)
         del user_model['confirm_password']
-        return user_schema.dump(user), 201
+        return user_schema.dump(user), 200
 
 
 class UserResource(Resource):
