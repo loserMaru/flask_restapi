@@ -16,7 +16,7 @@ reservations_schema = ReservationSchema(many=True)
 reservation_model = reservationNS.model('Reservation', {
     'id': fields.Integer(readonly=True),
     'day': fields.Date(required=True),
-    'time': fields.String(description='Time in HH:MM format', required=True),
+    'time': fields.String(description='Time in HH:MM format', default='23:05', required=True),
     'number': fields.String(required=True),
     'name': fields.String(required=True),
     'price': fields.Float(required=True),
@@ -46,14 +46,6 @@ class ReservationListResource(Resource):
         errors = reservation_schema.validate(data)
         if errors:
             return jsonify(errors), 400
-        if isinstance(data['user_id'], str):
-            # Try to find a user by email and set their id as user_id
-            email = data['user_id']
-            user = User.query.filter_by(email=email).first()
-            if user:
-                data['user_id'] = user.id
-            else:
-                return {'message': f'Пользователь с e-mail {email} не найден'}, 400
         reservation = Reservation(
             day=datetime.strptime(data['day'], '%Y-%m-%d').date(),
             time=data['time'],
