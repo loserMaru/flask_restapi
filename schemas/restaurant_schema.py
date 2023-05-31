@@ -9,4 +9,4 @@ class RestaurantSchema(Schema):
     price = fields.Float(required=True)
     star = fields.Float(required=True)
     tableCount = fields.Int(required=True)
-    cat_id = fields.Int(required=True)
+    category_id = fields.Int(required=True)

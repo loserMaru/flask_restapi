@@ -105,18 +105,19 @@ class Restaurant(db.Model):
     price = db.Column(db.Float(), nullable=False)
     star = db.Column(db.Float(), nullable=False)
     tableCount = db.Column(db.Integer(), nullable=False)
-    cat_id = db.Column(db.Integer(), nullable=False)
+    category_id = db.Column(db.Integer(), db.ForeignKey('category.id'), nullable=False)
+    category = db.relationship('Category', backref='restaurants')
 
     def to_dict(self):
         return {
             'id': self.id,
             'name': self.name,
-            'description': self.address,
+            'description': self.description,
             'picture': self.picture,
             'price': self.price,
             'star': self.star,
             'tableCount': self.tableCount,
-            'cat_id': self.cat_id,
+            'category_id': self.category_id,
         }
 
 
@@ -134,4 +135,16 @@ class Tables(db.Model):
             'number': self.number,
             'seat': self.seat,
             'restaurant_id': self.restaurant_id
+        }
+
+
+class Category(db.Model):
+    __tablename__ = 'category'
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(45), nullable=False)
+
+    def to_dict(self):
+        return {
+            'id': self.id,
+            'name': self.name
         }

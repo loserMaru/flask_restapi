@@ -3,9 +3,14 @@ from flask import request
 from flask_restx import fields, Resource
 
 from extensions import api, db
-from extensions.flask_restx_extension import restaurantNS
-from models import Restaurant, Favorite, Reservation
+from extensions.flask_restx_extension import restaurantNS, categoryNS
+from models import Restaurant, Favorite, Reservation, Category
 from schemas import RestaurantSchema
+
+category_model = categoryNS.model('Category', {
+    'id': fields.Integer(readonly=True),
+    'name': fields.String(required=True)
+})
 
 restaurant_model = restaurantNS.model('Restaurant', {
     'id': fields.Integer(readonly=True),
@@ -13,9 +18,9 @@ restaurant_model = restaurantNS.model('Restaurant', {
     'description': fields.String(required=True),
     'picture': fields.String(),
     'price': fields.Float(required=True),
-    'star': fields.Float(required=True, default=False),
+    'star': fields.Float(required=True),
     'tableCount': fields.Integer(required=True),
-    'cat_id': fields.Integer(required=True)
+    'category_id': fields.Nested(category_model)
 })
 
 restaurant_schema = RestaurantSchema()
@@ -37,9 +42,21 @@ class RestaurantListResource(Resource):
     })
     @restaurantNS.expect(restaurant_model)
     def post(self):
-        restaurant = Restaurant(**restaurantNS.payload)
+        restaurant_data = restaurantNS.payload
+
+        category_data = restaurant_data.pop('category_id', None)
+        if category_data:
+            category = Category.query.filter_by(name=category_data['name']).first()
+            if category is None:
+                category = Category(name=category_data['name'])
+                db.session.add(category)
+                db.session.commit()
+            restaurant_data['category_id'] = category.id
+
+        restaurant = Restaurant(**restaurant_data)
         db.session.add(restaurant)
         db.session.commit()
+
         return restaurant.to_dict(), 201
 
 
