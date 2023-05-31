@@ -5,4 +5,4 @@ from extensions.flask_jwt_extension import jwt
 
 # Namespaces
 from .flask_restx_extension import userNS, cardNS, tableNS, restaurantNS, reservationNS, profileNS, favoriteNS, uploadNS
-from .flask_restx_extension import loginNS
+from .flask_restx_extension import loginNS, authNS, authWebNS, categoryNS

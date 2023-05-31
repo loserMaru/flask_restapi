@@ -2,20 +2,18 @@ from flask import Flask
 from flask_cors import CORS
 
 from extensions import db, api, ma, uploadNS, jwt, loginNS
-from extensions import favoriteNS, profileNS, reservationNS, restaurantNS, tableNS, cardNS, userNS
-from extensions.flask_restx_extension import authNS, authWebNS
-from form import CardResource, CardResourceList
+from extensions import favoriteNS, profileNS, reservationNS, restaurantNS, tableNS, cardNS, userNS, authNS, authWebNS
+from extensions import categoryNS
+from form import CardResource, CardResourceList, CategoryResourceList, CategoryResource
 from form import FavoriteResource, FavoriteResourceList
-from form import ProfileResource, ProfileResourceList
+from form import ProfileResource, ProfileResourceList, UploadProfilePic
 from form import ReservationResource, ReservationListResource
 from form import RestaurantListResource, RestaurantResource
 from form import TableResource, TableResourceList
-from form import UserResource, UserResourceList
-from form.auth import AuthResource
-from form.authweb import WebAuthResource, ReservationStatusOne, ReservationStatusZero
-from form.profile import UploadProfilePic
-from form.uploads import UploadImage
-from form.user import UserEmailResource
+from form import UserResource, UserResourceList, UserEmailResource
+from form import AuthResource
+from form import WebAuthResource, ReservationStatusOne, ReservationStatusZero
+from form import UploadImage
 
 
 def register_resource(api):
@@ -73,6 +71,11 @@ def register_resource(api):
     # Uploads
     uploadNS.add_resource(UploadImage, '')
     api.add_namespace(uploadNS, path='/upload')
+
+    # Categories
+    categoryNS.add_resource(CategoryResourceList, '')
+    categoryNS.add_resource(CategoryResource, '/<int:id>')
+    api.add_namespace(categoryNS, path='/category')
 
 
 def create_app():
