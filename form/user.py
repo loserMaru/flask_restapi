@@ -7,7 +7,7 @@ from werkzeug import security
 from extensions import db
 from extensions.flask_restx_extension import userNS, api
 from form.validations import is_valid_email, password_is_valid
-from models import User
+from models import User, Profile
 from schemas import UserSchema
 
 user_schema = UserSchema()
@@ -58,6 +58,15 @@ class UserResourceList(Resource):
         db.session.commit()
         db.session.refresh(user)
         del user_model['confirm_password']
+
+        # Добавление профиля
+        profile = Profile(nickname=email,
+                          picture='Информация не указана',
+                          phone='Информация не указана',
+                          user_id=user.id)
+        db.session.add(profile)
+        db.session.commit()
+
         return user_schema.dump(user), 200
 
 
