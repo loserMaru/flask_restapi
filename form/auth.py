@@ -1,8 +1,4 @@
-from datetime import datetime, timedelta
-
-import jwt
 from flask import request
-from flask_bcrypt import check_password_hash
 from flask_jwt_extended import create_access_token
 from flask_restx import Resource, reqparse, fields
 
@@ -10,6 +6,7 @@ from extensions import loginNS
 from extensions.flask_restx_extension import authNS
 from form.validations import is_valid_email, password_is_valid, verify_password
 from models import User
+from schemas import UserSchema
 
 login_model = loginNS.model('Login', {
     'email': fields.String(required=True, default='string@gmail.com'),
@@ -17,7 +14,7 @@ login_model = loginNS.model('Login', {
 })
 
 JWT_SECRET_KEY = 'super-secret-key'
-
+user_schema = UserSchema()
 
 # @loginNS.route('/', methods=['POST'])
 # class Login(Resource):
@@ -62,10 +59,6 @@ class AuthResource(Resource):
             authNS.abort(401, 'Неправильный email или пароль')
 
         # Generate JWT token
-        payload = {
-            'user_id': user.id,
-            'exp': datetime.utcnow() + timedelta(days=1)
-        }
-        token = jwt.encode(payload, JWT_SECRET_KEY, algorithm='HS256')
+        access_token = create_access_token(identity=user.to_dict())
+        return {'access_token': access_token, 'user': user.to_dict()}, 200
 
-        return {'access_token': token}, 200

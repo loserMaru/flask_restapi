@@ -27,10 +27,6 @@ def register_resource(api):
     authWebNS.add_resource(ReservationStatusZero, '/zero')
     api.add_namespace(authWebNS, path='/web')
 
-    # Login
-    # loginNS.add_resource(Login, '')
-    # api.add_namespace(loginNS, path='/login')
-
     #  User
     userNS.add_resource(UserResourceList, '')
     userNS.add_resource(UserResource, '/<int:id>')
