@@ -4,7 +4,7 @@ from flask_jwt_extended import jwt_required
 from flask_restx import fields, Resource
 from werkzeug import security
 
-from extensions import db
+from extensions import db, jwt_required_class
 from extensions.flask_restx_extension import userNS, api
 from form.validations import is_valid_email, password_is_valid
 from models import User, Profile
@@ -29,7 +29,7 @@ class UserResourceList(Resource):
     })
     @userNS.marshal_list_with(user_model, skip_none=True)
     @userNS.doc(security='jwt')
-    @jwt_required()
+    @jwt_required
     def get(self):
         users = User.query.all()
         return users, 200
@@ -72,12 +72,14 @@ class UserResourceList(Resource):
         return user_schema.dump(user), 200
 
 
+@jwt_required_class
 class UserResource(Resource):
     @api.doc(responses={
         200: 'Успешный GET-запрос',
         404: 'Ресурс не найден'
     })
     @userNS.marshal_with(user_model, skip_none=True)
+    @userNS.doc(security='jwt')
     def get(self, id):
         user = User.query.get(id)
         if not user:
@@ -88,6 +90,7 @@ class UserResource(Resource):
         200: 'Успешный PUT-запрос',
         404: 'Ресурс не найден'
     })
+    @userNS.doc(security='jwt')
     @userNS.expect(user_model, skip_none=True)
     def put(self, id):
         user = User.query.filter_by(id=id).first()
@@ -108,6 +111,7 @@ class UserResource(Resource):
         401: 'Неавторизованный доступ',
         404: 'Ресурс не найден'
     })
+    @userNS.doc(security='jwt')
     def delete(self, id):
         user = User.query.get(id)
         if not user:
@@ -121,11 +125,13 @@ class UserResource(Resource):
             return {'msg': 'Ошибка. У пользователя есть внешние ключи'}, 200
 
 
+@jwt_required_class
 class UserEmailResource(Resource):
     @api.doc(responses={
         200: 'Успешный GET-запрос',
         400: 'Некорректный запрос'
     })
+    @userNS.doc(security='jwt')
     @userNS.marshal_list_with(user_model, skip_none=True)
     def get(self, email):
         user = User.query.filter_by(email=email).first()

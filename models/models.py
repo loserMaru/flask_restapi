@@ -142,9 +142,29 @@ class Category(db.Model):
     __tablename__ = 'category'
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(45), nullable=False)
+    picture = db.Column(db.String(255))
 
     def to_dict(self):
         return {
             'id': self.id,
-            'name': self.name
+            'name': self.name,
+            'picture': self.picture
+        }
+
+
+class Rating(db.Model):
+    __tablename__ = 'rating'
+    id = db.Column(db.Integer, primary_key=True)
+    rating = db.Column(db.Float(), nullable=False)
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+    restaurant_id = db.Column(db.Integer, db.ForeignKey('restaurant.id'), nullable=False)
+    user = db.relationship('User', backref='ratings')
+    restaurant = db.relationship('Restaurant', backref='ratings')
+
+    def to_dict(self):
+        return {
+            'id': self.id,
+            'user_id': self.user_id,
+            'restaurant_id': self.restaurant_id,
+            'rating': self.rating
         }

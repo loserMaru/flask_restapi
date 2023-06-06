@@ -7,5 +7,6 @@ from form.favorite import FavoriteResource, FavoriteResourceList
 from form.card import CardResource, CardResourceList
 from form.category import CategoryResource, CategoryResourceList
 from form.authweb import WebAuthResource, ReservationStatusOne, ReservationStatusZero
+from form.rating import RatingResourceList, RatingResource
 from form.auth import AuthResource
 from form.uploads import UploadImage

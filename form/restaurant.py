@@ -2,7 +2,7 @@ import sqlalchemy
 from flask import request
 from flask_restx import fields, Resource
 
-from extensions import api, db
+from extensions import api, db, jwt_required_class
 from extensions.flask_restx_extension import restaurantNS, categoryNS
 from models import Restaurant, Favorite, Reservation, Category
 from schemas import RestaurantSchema
@@ -26,12 +26,14 @@ restaurant_model = restaurantNS.model('Restaurant', {
 restaurant_schema = RestaurantSchema()
 
 
+@jwt_required_class
 class RestaurantListResource(Resource):
     @api.doc(responses={
         200: 'Успешный GET-запрос',
         400: 'Некорректный запрос'
     })
     @restaurantNS.marshal_list_with(restaurant_model)
+    @restaurantNS.doc(security='jwt')
     def get(self):
         restaurants = Restaurant.query.all()
         return restaurants, 200
@@ -41,6 +43,7 @@ class RestaurantListResource(Resource):
         400: 'Некорректный запрос'
     })
     @restaurantNS.expect(restaurant_model)
+    @restaurantNS.doc(security='jwt')
     def post(self):
         restaurant_data = restaurantNS.payload
 
@@ -60,12 +63,14 @@ class RestaurantListResource(Resource):
         return restaurant.to_dict(), 201
 
 
+@jwt_required_class
 class RestaurantResource(Resource):
     @api.doc(responses={
         200: 'Успешный GET-запрос',
         404: 'Ресторан не найден'
     })
     @restaurantNS.marshal_with(restaurant_model)
+    @restaurantNS.doc(security='jwt')
     def get(self, id):
         restaurant = Restaurant.query.filter_by(id=id).first()
         if not restaurant:
@@ -77,6 +82,7 @@ class RestaurantResource(Resource):
         404: 'Ресторан не найден'
     })
     @restaurantNS.expect(restaurant_model)
+    @restaurantNS.doc(security='jwt')
     def put(self, id):
         restaurant = Restaurant.query.filter_by(id=id).first()
         if not restaurant:
@@ -97,6 +103,7 @@ class RestaurantResource(Resource):
         400: 'Некорректный запрос',
         404: 'Ресторан не найден'
     })
+    @restaurantNS.doc(security='jwt')
     def delete(self, id):
         restaurant = Restaurant.query.filter_by(id=id).first()
         if not restaurant:

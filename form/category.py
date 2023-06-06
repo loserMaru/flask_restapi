@@ -6,7 +6,7 @@ from models import Category
 
 category_model = categoryNS.model('Category', {
     'id': fields.Integer(readonly=True),
-    'name': fields.String(required=True)
+    'name': fields.String(required=True),
 })
 
 
