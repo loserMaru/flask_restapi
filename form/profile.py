@@ -4,7 +4,7 @@ from flask import request
 from flask_restx import fields, Resource
 from imgurpython import ImgurClient
 
-from extensions import api, db
+from extensions import api, db, jwt_required_class
 from extensions.flask_restx_extension import profileNS
 from form.validations import num_is_valid
 from models import Profile
@@ -30,11 +30,13 @@ profile_schema = ProfileSchema()
 # upload_parser.add_argument('user_id', type=int, required=True, help='User ID (required)')
 
 
+@jwt_required_class
 class ProfileResourceList(Resource):
     @api.doc(responses={
         200: 'Успешный GET-запрос',
         400: 'Некорректный запрос'
     })
+    @profileNS.doc(security='jwt')
     @profileNS.marshal_list_with(profile_model)
     def get(self):
         profiles = Profile.query.all()
@@ -45,6 +47,7 @@ class ProfileResourceList(Resource):
         400: 'Некорректный запрос'
     })
     @profileNS.expect(profile_model)
+    @profileNS.doc(security='jwt')
     # @profileNS.expect(upload_parser)
     def post(self):
         data = request.json
@@ -63,11 +66,13 @@ class ProfileResourceList(Resource):
         return profile_schema.dump(profile), 201
 
 
+@jwt_required_class
 class ProfileResource(Resource):
     @api.doc(responses={
         200: 'Успешный GET-запрос',
         404: 'Ресурс не найден'
     })
+    @profileNS.doc(security='jwt')
     @profileNS.marshal_with(profile_model)
     def get(self, id):
         profile = Profile.query.filter_by(id=id).first()
@@ -79,6 +84,7 @@ class ProfileResource(Resource):
         200: 'Успешный PUT-запрос',
         404: 'Ресурс не найден'
     })
+    @profileNS.doc(security='jwt')
     @profileNS.expect(profile_model)
     def put(self, id):
         profile = Profile.query.filter_by(id=id).first()
@@ -96,6 +102,7 @@ class ProfileResource(Resource):
         200: 'Успешный DELETE-запрос, ресурс удален',
         404: 'Ресурс не найден'
     })
+    @profileNS.doc(security='jwt')
     def delete(self, id):
         profile = Profile.query.filter_by(id=id).first()
         if not profile:
@@ -105,7 +112,9 @@ class ProfileResource(Resource):
         return {'msg': 'Профиль удален успешно'}, 200
 
 
+@profileNS.doc(security='jwt')
 class UploadProfilePic(Resource):
+    @profileNS.doc(security='jwt')
     @profileNS.expect(profileNS.parser().add_argument('image', location='files', type='file'))
     def put(self, id):
         profile = Profile.query.filter_by(id=id).first()
@@ -140,4 +149,3 @@ class UploadProfilePic(Resource):
         db.session.commit()
 
         return profile_schema.dump(profile), 201
-

@@ -2,7 +2,7 @@ from flask_restx import fields, Resource
 from sqlalchemy.exc import IntegrityError
 from flask import request
 
-from extensions import api, db
+from extensions import api, db, jwt_required_class
 from extensions.flask_restx_extension import favoriteNS
 from models import Favorite
 from schemas import FavoriteSchema
@@ -16,11 +16,13 @@ favorite_model = favoriteNS.model('Favorite', {
 })
 
 
+@jwt_required_class
 class FavoriteResourceList(Resource):
     @api.doc(responses={
         200: 'Успешный GET-запрос',
         400: 'Некорректный запрос'
     })
+    @favoriteNS.doc(security='jwt')
     @favoriteNS.marshal_list_with(favorite_model)
     def get(self):
         favorites = Favorite.query.all()
@@ -30,6 +32,7 @@ class FavoriteResourceList(Resource):
         201: 'Успешный POST-запрос, создание нового ресурса',
         400: 'Некорректный запрос'
     })
+    @favoriteNS.doc(security='jwt')
     @favoriteNS.expect(favorite_model)
     def post(self):
         data = request.json
@@ -44,11 +47,13 @@ class FavoriteResourceList(Resource):
             return {'msg': 'Ошибка сохранения в базу данных. Неверные внешние ключи'}, 400
 
 
+@jwt_required_class
 class FavoriteResource(Resource):
     @api.doc(responses={
         200: 'Успешный GET-запрос',
         404: 'Ресурс не найден'
     })
+    @favoriteNS.doc(security='jwt')
     @favoriteNS.marshal_with(favorite_model)
     def get(self, id):
         favorite = Favorite.query.get(id)
@@ -60,6 +65,7 @@ class FavoriteResource(Resource):
         200: 'Успешный PUT-запрос',
         404: 'Ресурс не найден'
     })
+    @favoriteNS.doc(security='jwt')
     @favoriteNS.expect(favorite_model)
     def put(self, id):
         favorite = Favorite.query.filter_by(id=id).first()
@@ -78,6 +84,7 @@ class FavoriteResource(Resource):
         200: 'Успешный DELETE-запрос, ресурс удален',
         404: 'Ресурс не найден'
     })
+    @favoriteNS.doc(security='jwt')
     def delete(self, id):
         favorite = Favorite.query.filter_by(id=id).first()
         if not favorite:
