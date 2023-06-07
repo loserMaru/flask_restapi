@@ -26,3 +26,9 @@ def hash_password(password):
 
 def verify_password(password, hash):
     return check_password_hash(hash, password)
+
+
+def contains_only_digits(input_str):
+    """Проверка того, что строка содержит только цифры"""
+    regex = r'^\d+$'
+    return bool(re.match(regex, input_str))

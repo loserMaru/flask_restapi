@@ -35,6 +35,7 @@ class RestaurantListResource(Resource):
     @restaurantNS.marshal_list_with(restaurant_model)
     @restaurantNS.doc(security='jwt')
     def get(self):
+        """Get a list of restaurants"""
         restaurants = Restaurant.query.all()
         return restaurants, 200
 
@@ -45,6 +46,7 @@ class RestaurantListResource(Resource):
     @restaurantNS.expect(restaurant_model)
     @restaurantNS.doc(security='jwt')
     def post(self):
+        """Create new restaurant"""
         restaurant_data = restaurantNS.payload
 
         category_data = restaurant_data.pop('category_id', None)
@@ -72,6 +74,7 @@ class RestaurantResource(Resource):
     @restaurantNS.marshal_with(restaurant_model)
     @restaurantNS.doc(security='jwt')
     def get(self, id):
+        """Get restaurant by ID"""
         restaurant = Restaurant.query.filter_by(id=id).first()
         if not restaurant:
             restaurantNS.abort(404, 'Ресторан не найден')
@@ -84,6 +87,7 @@ class RestaurantResource(Resource):
     @restaurantNS.expect(restaurant_model)
     @restaurantNS.doc(security='jwt')
     def put(self, id):
+        """Edit restaurant by ID"""
         restaurant = Restaurant.query.filter_by(id=id).first()
         if not restaurant:
             restaurantNS.abort(404, 'Ресторан не найден')
@@ -105,6 +109,7 @@ class RestaurantResource(Resource):
     })
     @restaurantNS.doc(security='jwt')
     def delete(self, id):
+        """Delete restaurant by ID"""
         restaurant = Restaurant.query.filter_by(id=id).first()
         if not restaurant:
             restaurantNS.abort(404, 'Ресторан не найден')

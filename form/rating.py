@@ -22,6 +22,7 @@ class RatingResourceList(Resource):
     @ratingNS.marshal_list_with(rating_model)
     @ratingNS.doc(security='jwt')
     def get(self):
+        """Get a list of ratings"""
         ratings = Rating.query.all()
         return ratings, 200
 
@@ -67,6 +68,7 @@ class RatingResource(Resource):
     @ratingNS.doc(security='jwt')
     @ratingNS.marshal_with(rating_model)
     def get(self, id):
+        """Get rating by id"""
         rating = Rating.query.filter_by(id=id).first()
         if not rating:
             api.abort(404, 'rating not found')
@@ -79,6 +81,7 @@ class RatingResource(Resource):
     @ratingNS.doc(security='jwt')
     @ratingNS.expect(rating_model)
     def put(self, id):
+        """Edit rating by id"""
         rating = Rating.query.filter_by(id=id).first()
         if not rating:
             api.abort(404, 'Rating not found')

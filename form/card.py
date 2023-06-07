@@ -1,9 +1,8 @@
-import re
-
 from flask_restx import fields, Resource
 
-from extensions import api, db
+from extensions import api, db, jwt_required_class
 from extensions.flask_restx_extension import cardNS
+from form.validations import contains_only_digits
 from models.models import Card
 from schemas import CardSchema
 
@@ -16,19 +15,16 @@ card_model = cardNS.model('Card', {
 card_schema = CardSchema()
 
 
-def contains_only_digits(input_str):
-    """Проверка того, что строка содержит только цифры"""
-    regex = r'^\d+$'
-    return bool(re.match(regex, input_str))
-
-
+@jwt_required_class
 class CardResourceList(Resource):
     @api.doc(responses={
         200: 'Успешный GET-запрос',
         400: 'Некорректный запрос'
     })
+    @cardNS.doc(security='jwt')
     @cardNS.marshal_list_with(card_model)
     def get(self):
+        """Get card list"""
         cards = Card.query.all()
         return cards
 
@@ -37,8 +33,10 @@ class CardResourceList(Resource):
         400: 'Некорректный запрос'
     })
     @cardNS.expect(card_model)
+    @cardNS.doc(security='jwt')
     @cardNS.marshal_with(card_model, code=201)
     def post(self):
+        """Add new card"""
         card = Card(**cardNS.payload)
         card_number = cardNS.payload.get('cardNumber')
         if not contains_only_digits(card_number):
@@ -51,13 +49,16 @@ class CardResourceList(Resource):
         return card.to_dict(), 201
 
 
+@jwt_required_class
 class CardResource(Resource):
     @api.doc(responses={
         200: 'Успешный GET-запрос',
         404: 'Ресурс не найден'
     })
+    @cardNS.doc(security='jwt')
     @cardNS.marshal_with(card_model)
     def get(self, id):
+        """Get card with id"""
         card = Card.query.filter_by(id=id).first()
         if not card:
             cardNS.abort(404, 'Карта не найдена')
@@ -67,8 +68,10 @@ class CardResource(Resource):
         200: 'Успешный PUT-запрос',
         404: 'Ресурс не найден'
     })
+    @cardNS.doc(security='jwt')
     @cardNS.expect(card_model)
     def put(self, id):
+        """Edit an existing card"""
         card = Card.query.filter_by(id=id).first()
         if not card:
             cardNS.abort(404, 'Карта не найдена')
@@ -81,7 +84,9 @@ class CardResource(Resource):
         200: 'Успешный DELETE-запрос, ресурс удален',
         404: 'Ресурс не найден'
     })
+    @cardNS.doc(security='jwt')
     def delete(self, id):
+        """Delete existing card"""
         card = Card.query.filter_by(id=id).first()
         if not card:
             cardNS.abort(404, 'Карта не найдена')

@@ -25,6 +25,7 @@ class FavoriteResourceList(Resource):
     @favoriteNS.doc(security='jwt')
     @favoriteNS.marshal_list_with(favorite_model)
     def get(self):
+        """Get list of favorite restaurants"""
         favorites = Favorite.query.all()
         return favorites, 200
 
@@ -35,6 +36,7 @@ class FavoriteResourceList(Resource):
     @favoriteNS.doc(security='jwt')
     @favoriteNS.expect(favorite_model)
     def post(self):
+        """Create new favorite restaurant"""
         data = request.json
         favorite = Favorite(user_id=data.get('user_id'),
                             restaurant_id=data.get('restaurant_id'))
@@ -56,6 +58,7 @@ class FavoriteResource(Resource):
     @favoriteNS.doc(security='jwt')
     @favoriteNS.marshal_with(favorite_model)
     def get(self, id):
+        """Get favorite restaurant by id"""
         favorite = Favorite.query.get(id)
         if not favorite:
             favoriteNS.abort(404, 'Избранное не найдено')
@@ -68,6 +71,7 @@ class FavoriteResource(Resource):
     @favoriteNS.doc(security='jwt')
     @favoriteNS.expect(favorite_model)
     def put(self, id):
+        """Edit favorite restaurant by id"""
         favorite = Favorite.query.filter_by(id=id).first()
         if not favorite:
             favoriteNS.abort(404, 'Избранное не найдено')
@@ -86,6 +90,7 @@ class FavoriteResource(Resource):
     })
     @favoriteNS.doc(security='jwt')
     def delete(self, id):
+        """Delete favorite restaurant by id"""
         favorite = Favorite.query.filter_by(id=id).first()
         if not favorite:
             favoriteNS.abort(404, 'Избранное не найдено')

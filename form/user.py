@@ -31,6 +31,7 @@ class UserResourceList(Resource):
     @userNS.doc(security='jwt')
     @jwt_required()
     def get(self):
+        """Get list of users"""
         users = User.query.all()
         return users, 200
 
@@ -41,6 +42,7 @@ class UserResourceList(Resource):
     @userNS.expect(user_model)
     @userNS.marshal_with(user_model, code=200, skip_none=True)
     def post(self):
+        """Register new user"""
         email = api.payload.get('email')
         if not is_valid_email(email):
             userNS.abort(400, 'Некорректный email')
@@ -81,6 +83,7 @@ class UserResource(Resource):
     @userNS.marshal_with(user_model, skip_none=True)
     @userNS.doc(security='jwt')
     def get(self, id):
+        """Get user with id"""
         user = User.query.get(id)
         if not user:
             api.abort(404, 'User not found')
@@ -93,6 +96,7 @@ class UserResource(Resource):
     @userNS.doc(security='jwt')
     @userNS.expect(user_model, skip_none=True)
     def put(self, id):
+        """Edit user with id"""
         user = User.query.filter_by(id=id).first()
         if not user:
             api.abort(404, 'User not found')
@@ -113,6 +117,7 @@ class UserResource(Resource):
     })
     @userNS.doc(security='jwt')
     def delete(self, id):
+        """Delete user account"""
         user = User.query.get(id)
         if not user:
             api.abort(404, message='Пользователь с id {} не найден'.format(id))
@@ -134,6 +139,7 @@ class UserEmailResource(Resource):
     @userNS.doc(security='jwt')
     @userNS.marshal_list_with(user_model, skip_none=True)
     def get(self, email):
+        """Get user_id with email"""
         user = User.query.filter_by(email=email).first()
         if not user:
             api.abort(404, 'User not found')

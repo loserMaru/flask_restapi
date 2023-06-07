@@ -20,6 +20,7 @@ user_schema = UserSchema()
 class AuthResource(Resource):
     @authNS.expect(login_model)
     def post(self):
+        """Login and get access and refresh tokens"""
         data = request.json
         email = data.get('email')
         password = data.get('password')
@@ -47,6 +48,7 @@ class TokenRefresh(Resource):
     @authNS.doc(security='jwt')
     @jwt_required(refresh=True)
     def post(self):
+        """Refresh access tokens"""
         current_user = get_jwt_identity()
         access_token = create_access_token(identity=current_user)
         return {'access_token': access_token}, 200

@@ -39,6 +39,7 @@ class ProfileResourceList(Resource):
     @profileNS.doc(security='jwt')
     @profileNS.marshal_list_with(profile_model)
     def get(self):
+        """Get a list of profiles"""
         profiles = Profile.query.all()
         return profiles, 200
 
@@ -50,6 +51,7 @@ class ProfileResourceList(Resource):
     @profileNS.doc(security='jwt')
     # @profileNS.expect(upload_parser)
     def post(self):
+        """Create new profile"""
         data = request.json
         # image = request.files.get('picture')
         phone = profileNS.payload.get('phone')
@@ -75,6 +77,7 @@ class ProfileResource(Resource):
     @profileNS.doc(security='jwt')
     @profileNS.marshal_with(profile_model)
     def get(self, id):
+        """Get profile by ID"""
         profile = Profile.query.filter_by(id=id).first()
         if not profile:
             profileNS.abort(404, 'Профиль не найден')
@@ -87,6 +90,7 @@ class ProfileResource(Resource):
     @profileNS.doc(security='jwt')
     @profileNS.expect(profile_model)
     def put(self, id):
+        """Edit profile by ID"""
         profile = Profile.query.filter_by(id=id).first()
         if not profile:
             profileNS.abort(404, 'Профиль не найден')
@@ -104,6 +108,7 @@ class ProfileResource(Resource):
     })
     @profileNS.doc(security='jwt')
     def delete(self, id):
+        """Delete profile by ID"""
         profile = Profile.query.filter_by(id=id).first()
         if not profile:
             profileNS.abort(404, 'Профиль не найден')
@@ -117,6 +122,7 @@ class UploadProfilePic(Resource):
     @profileNS.doc(security='jwt')
     @profileNS.expect(profileNS.parser().add_argument('image', location='files', type='file'))
     def put(self, id):
+        """Give picture for profile by his ID"""
         profile = Profile.query.filter_by(id=id).first()
         if not profile:
             profileNS.abort(404, 'Профиль не найден')
