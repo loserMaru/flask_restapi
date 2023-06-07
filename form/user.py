@@ -29,7 +29,7 @@ class UserResourceList(Resource):
     })
     @userNS.marshal_list_with(user_model, skip_none=True)
     @userNS.doc(security='jwt')
-    @jwt_required
+    @jwt_required()
     def get(self):
         users = User.query.all()
         return users, 200

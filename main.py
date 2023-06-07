@@ -1,3 +1,5 @@
+from datetime import timedelta
+
 from flask import Flask
 from flask_cors import CORS
 
@@ -5,7 +7,7 @@ from extensions import db, api, ma, uploadNS, jwt, loginNS, ratingNS
 from extensions import favoriteNS, profileNS, reservationNS, restaurantNS, tableNS, cardNS, userNS, authNS, authWebNS
 from extensions import categoryNS
 from form import CardResource, CardResourceList, CategoryResourceList, CategoryResource, RatingResourceList, \
-    RatingResource
+    RatingResource, TokenRefresh
 from form import FavoriteResource, FavoriteResourceList
 from form import ProfileResource, ProfileResourceList, UploadProfilePic
 from form import ReservationResource, ReservationListResource
@@ -19,6 +21,9 @@ from form.rating import AverageRatingResource
 
 
 def register_resource(api):
+    # Refresh Token
+    authNS.add_resource(TokenRefresh, '/refresh')
+
     # Auth
     authNS.add_resource(AuthResource, '')
     api.add_namespace(authNS, path='/auth')
@@ -105,6 +110,8 @@ def create_app():
     app.config['JWT_SECRET_KEY'] = 'super-secret-key'
     app.config['JWT_HEADER_NAME'] = 'Authorization'
     app.config['JWT_HEADER_TYPE'] = 'Bearer'
+    app.config['JWT_ACCESS_TOKEN_EXPIRES'] = timedelta(hours=1)  # Время истечения access token
+    app.config['JWT_REFRESH_TOKEN_EXPIRES'] = timedelta(days=30)  # Время истечения refresh token
 
     # Inits
     db.init_app(app)

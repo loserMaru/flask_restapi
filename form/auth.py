@@ -1,5 +1,5 @@
 from flask import request
-from flask_jwt_extended import create_access_token
+from flask_jwt_extended import create_access_token, create_refresh_token, get_jwt_identity, jwt_required
 from flask_restx import Resource, fields
 
 from extensions import loginNS
@@ -38,4 +38,15 @@ class AuthResource(Resource):
 
         # Generate JWT token
         access_token = create_access_token(identity=user.to_dict())
-        return {'access_token': access_token, 'user': user.to_dict()}, 200
+        refresh_token = create_refresh_token(identity=user.to_dict())
+
+        return {'access_token': access_token, 'refresh_token': refresh_token, 'user': user.to_dict()}, 200
+
+
+class TokenRefresh(Resource):
+    @authNS.doc(security='jwt')
+    @jwt_required(refresh=True)
+    def post(self):
+        current_user = get_jwt_identity()
+        access_token = create_access_token(identity=current_user)
+        return {'access_token': access_token}, 200
