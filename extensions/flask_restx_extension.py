@@ -7,7 +7,7 @@ api = Api(title='Мой Столик', version='1.0',
                   'type': 'apiKey',
                   'in': 'header',
                   'name': 'Authorization',
-                  'description': 'JWT authorization, e.g. "Bearer {token}"'
+                  'description': 'JWT authorization, e.g. "token"'
               }
           })
 
