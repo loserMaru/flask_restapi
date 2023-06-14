@@ -20,7 +20,7 @@ reservation_model = reservationNS.model('Reservation', {
     'number': fields.String(required=True),
     'name': fields.String(required=True),
     'price': fields.Float(required=True),
-    'status': fields.Boolean(required=True, default='false'),
+    'status': fields.Boolean,
     'picture': fields.String(required=True),
     'user_id': fields.Integer(required=True),
     'restaurant_id': fields.Integer(required=True),
@@ -43,7 +43,7 @@ class ReservationListResource(Resource):
         201: 'Успешный POST-запрос, объект создан',
         400: 'Неверные данные'})
     @reservationNS.doc(security='jwt')
-    @reservationNS.expect(reservation_model, validate=True)
+    @reservationNS.expect(reservation_model)
     def post(self):
         """Create new reservation"""
         data = request.json
@@ -56,7 +56,7 @@ class ReservationListResource(Resource):
             number=data['number'],
             name=data['name'],
             price=data['price'],
-            status=data['status'],
+            status=data.get('status'),
             picture=data['picture'],
             user_id=data['user_id'],
             restaurant_id=data.get('restaurant_id')

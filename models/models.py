@@ -1,3 +1,5 @@
+from sqlalchemy.orm import backref
+
 from extensions.database_extension import db
 
 
@@ -36,8 +38,9 @@ class Favorite(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
     restaurant_id = db.Column(db.Integer, db.ForeignKey('restaurant.id'), nullable=False)
-    user = db.relationship('User', backref='favorites')
-    restaurant = db.relationship('Restaurant', backref='favorites')
+
+    user = db.relationship('User', backref=backref('favorites', cascade='all, delete'))
+    restaurant = db.relationship('Restaurant', backref=backref('favorites', cascade='all, delete'))
 
     def to_dict(self):
         return {
@@ -74,12 +77,13 @@ class Reservation(db.Model):
     number = db.Column(db.String(255), nullable=False)
     name = db.Column(db.String(255), nullable=False)
     price = db.Column(db.Float(), nullable=False)
-    status = db.Column(db.Boolean(), nullable=False)
+    status = db.Column(db.Boolean())
     picture = db.Column(db.String(255))
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
     restaurant_id = db.Column(db.Integer, db.ForeignKey('restaurant.id'), nullable=False)
-    user = db.relationship('User', backref='reservations')
-    restaurant = db.relationship('Restaurant', backref='reservations')
+
+    user = db.relationship('User', backref=backref('reservations', cascade='all, delete'))
+    restaurant = db.relationship('Restaurant', backref=backref('reservations', cascade='all, delete'))
 
     def to_dict(self):
         return {

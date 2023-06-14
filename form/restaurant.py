@@ -113,12 +113,6 @@ class RestaurantResource(Resource):
         restaurant = Restaurant.query.filter_by(id=id).first()
         if not restaurant:
             restaurantNS.abort(404, 'Ресторан не найден')
-        favorites = Favorite.query.filter_by(restaurant_id=restaurant.id).all()
-        for favorite in favorites:
-            db.session.delete(favorite)
-        reservations = Reservation.query.filter_by(restaurant_id=restaurant.id).all()
-        for reservation in reservations:
-            db.session.delete(reservation)
         try:
             db.session.delete(restaurant)
             db.session.commit()

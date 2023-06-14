@@ -19,5 +19,5 @@ class Config:
     JWT_HEADER_NAME = 'Authorization'
     JWT_HEADER_TYPE = None
     JWT_TOKEN_LOCATION = 'headers'
-    JWT_ACCESS_TOKEN_EXPIRES = timedelta(hours=1)  # Время истечения access token
+    JWT_ACCESS_TOKEN_EXPIRES = timedelta(hours=24)  # Время истечения access token
     JWT_REFRESH_TOKEN_EXPIRES = timedelta(days=30)  # Время истечения refresh token
