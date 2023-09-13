@@ -22,14 +22,15 @@ user_model = userNS.model('User', {
 })
 
 
+@jwt_required_class
 class UserResourceList(Resource):
+
     @api.doc(responses={
         200: 'Успешный GET-запрос',
         400: 'Некорректный запрос'
     })
-    @userNS.marshal_list_with(user_model, skip_none=True)
     @userNS.doc(security='jwt')
-    @jwt_required()
+    @userNS.marshal_list_with(user_model, skip_none=True)
     def get(self):
         """Get list of users"""
         users = User.query.all()

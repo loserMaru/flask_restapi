@@ -16,8 +16,8 @@ class Config:
 
     # JWT Token
     JWT_SECRET_KEY = os.getenv('JWT_SECRET_KEY')
-    JWT_HEADER_NAME = 'Authorization'
-    JWT_HEADER_TYPE = None
+    JWT_HEADER_NAME = os.getenv('JWT_HEADER_NAME')
     JWT_TOKEN_LOCATION = 'headers'
-    JWT_ACCESS_TOKEN_EXPIRES = timedelta(hours=24)  # Время истечения access token
+    JWT_ACCESS_TOKEN_EXPIRES = timedelta(hours=24)  # Вре0
+    # мя истечения access token
     JWT_REFRESH_TOKEN_EXPIRES = timedelta(days=30)  # Время истечения refresh token
