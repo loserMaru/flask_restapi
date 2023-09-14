@@ -1,5 +1,6 @@
 from flask import Flask
 from flask_cors import CORS
+from flask_migrate import Migrate
 
 from extensions import categoryNS
 from extensions import db, api, ma, uploadNS, jwt, ratingNS
