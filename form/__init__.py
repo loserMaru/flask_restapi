@@ -5,7 +5,7 @@ from form.reservation import ReservationResource, ReservationListResource
 from form.profile import ProfileResource, ProfileResourceList, UploadProfilePic
 from form.favorite import FavoriteResource, FavoriteResourceList
 from form.card import CardResource, CardResourceList
-from form.category import CategoryResource, CategoryResourceList
+from form.category import CategoryResource, CategoryResourceList, UploadCategoryPic
 from form.authweb import WebAuthResource, ReservationStatusOne, ReservationStatusZero
 from form.rating import RatingResourceList, RatingResource
 from form.auth import AuthResource, TokenRefresh

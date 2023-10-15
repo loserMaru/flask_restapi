@@ -1,13 +1,13 @@
 from flask import Flask
 from flask_cors import CORS
-from flask_migrate import Migrate
 
+from config import Config
 from extensions import categoryNS
 from extensions import db, api, ma, uploadNS, jwt, ratingNS
 from extensions import favoriteNS, profileNS, reservationNS, restaurantNS, tableNS, cardNS, userNS, authNS, authWebNS
-from form import AuthResource
+from form import AuthResource, UploadCategoryPic
 from form import CardResource, CardResourceList, CategoryResourceList, CategoryResource, RatingResourceList, \
-    RatingResource, TokenRefresh
+                 RatingResource, TokenRefresh
 from form import FavoriteResource, FavoriteResourceList
 from form import ProfileResource, ProfileResourceList, UploadProfilePic
 from form import ReservationResource, ReservationListResource
@@ -17,7 +17,6 @@ from form import UploadImage
 from form import UserResource, UserResourceList, UserEmailResource
 from form import WebAuthResource, ReservationStatusOne, ReservationStatusZero
 from form.rating import AverageRatingResource
-from config import Config
 
 
 def register_resource(api):
@@ -78,6 +77,7 @@ def register_resource(api):
     # Categories
     categoryNS.add_resource(CategoryResourceList, '')
     categoryNS.add_resource(CategoryResource, '/<int:id>')
+    categoryNS.add_resource(UploadCategoryPic, '/upload/<int:id>')
     api.add_namespace(categoryNS, path='/category')
 
     # Ratings
@@ -106,4 +106,6 @@ def create_app():
 app = create_app()
 
 if __name__ == '__main__':
+    with app.app_context():
+        db.create_all()
     app.run(debug=True)

@@ -1,8 +1,14 @@
-from flask_restx import Resource, fields
-
-from extensions import api, db, jwt_required_class
+import os
 from extensions.flask_restx_extension import categoryNS
 from models import Category
+from flask import request
+from flask_restx import fields, Resource
+from imgurpython import ImgurClient
+
+from extensions import api, db, jwt_required_class
+from schemas import CategorySchema
+
+category_schema = CategorySchema()
 
 category_model = categoryNS.model('Category', {
     'id': fields.Integer(readonly=True),
@@ -17,8 +23,8 @@ class CategoryResourceList(Resource):
         200: 'Успешный GET-запрос',
         400: 'Некорректный запрос'
     })
-    @categoryNS.doc(security='jwt')
     @api.marshal_list_with(category_model)
+    @categoryNS.doc(security='jwt')
     def get(self):
         """Get a list of categories"""
         categories = Category.query.all()
@@ -83,3 +89,43 @@ class CategoryResource(Resource):
         db.session.delete(category)
         db.session.commit()
         return {'result': 'success'}, 204
+
+
+@categoryNS.doc(security='jwt')
+class UploadCategoryPic(Resource):
+    @categoryNS.doc(security='jwt')
+    @categoryNS.expect(categoryNS.parser().add_argument('image', location='files', type='file'))
+    def put(self, id):
+        """Give picture for category by his ID"""
+        category = Category.query.filter_by(id=id).first()
+        if not category:
+            categoryNS.abort(404, 'Профиль не найден')
+
+        client_id = '7ac7ce010e34893'
+        client_secret = '9d2d06f3d8801a800ebf8411f69e898eb667d779'
+
+        client = ImgurClient(client_id, client_secret)
+
+        image = request.files.get('image')
+        print(image)
+        if not image:
+            return {'message': 'No image uploaded'}, 400
+
+        # Save the image to a temporary directory
+        temp_dir = os.path.join(os.getcwd(), 'temp')
+        if not os.path.exists(temp_dir):
+            os.makedirs(temp_dir)
+        image_path = os.path.join(temp_dir, image.filename)
+        image.save(image_path)
+
+        # Upload the image to imgur
+        response = client.upload_from_path(image_path)
+
+        # Remove the temporary file
+        os.remove(image_path)
+
+        # Update category picture
+        category.picture = response['link']
+        db.session.commit()
+
+        return category_schema.dump(category), 201

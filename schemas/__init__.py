@@ -6,3 +6,4 @@ from schemas.user_schema import UserSchema
 from schemas.restaurant_schema import RestaurantSchema
 from schemas.profile_schema import ProfileSchema
 from schemas.rating_schema import RatingSchema
+from schemas.category_schema import CategorySchema
