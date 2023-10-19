@@ -20,3 +20,4 @@ class Config:
     JWT_TOKEN_LOCATION = 'headers'
     JWT_ACCESS_TOKEN_EXPIRES = timedelta(hours=24)  # Время истечения access token
     JWT_REFRESH_TOKEN_EXPIRES = timedelta(days=30)  # Время истечения refresh token
+    FLASK_DEBUG = int(os.environ['FLASK_DEBUG'])

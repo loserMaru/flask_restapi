@@ -9,7 +9,8 @@ from schemas import RestaurantSchema
 
 category_model = categoryNS.model('Category', {
     'id': fields.Integer(readonly=True),
-    'name': fields.String(required=True)
+    'name': fields.String(required=True),
+    'picture': fields.String()
 })
 
 restaurant_model = restaurantNS.model('Restaurant', {
@@ -20,7 +21,7 @@ restaurant_model = restaurantNS.model('Restaurant', {
     'price': fields.Float(required=True),
     'star': fields.Float(required=True),
     'tableCount': fields.Integer(required=True),
-    'category_id': fields.Nested(category_model)
+    'category': fields.Nested(category_model)
 })
 
 restaurant_schema = RestaurantSchema()
