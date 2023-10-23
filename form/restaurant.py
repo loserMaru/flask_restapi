@@ -7,12 +7,6 @@ from extensions.flask_restx_extension import restaurantNS, categoryNS
 from models import Restaurant, Favorite, Reservation, Category
 from schemas import RestaurantSchema
 
-category_model = categoryNS.model('Category', {
-    'id': fields.Integer(readonly=True),
-    'name': fields.String(required=True),
-    'picture': fields.String()
-})
-
 restaurant_model = restaurantNS.model('Restaurant', {
     'id': fields.Integer(readonly=True),
     'name': fields.String(required=True),
@@ -21,7 +15,7 @@ restaurant_model = restaurantNS.model('Restaurant', {
     'price': fields.Float(required=True),
     'star': fields.Float(required=True),
     'tableCount': fields.Integer(required=True),
-    'category': fields.Nested(category_model)
+    'category_id': fields.Integer(required=True)
 })
 
 restaurant_schema = RestaurantSchema()
@@ -50,15 +44,13 @@ class RestaurantListResource(Resource):
         """Create new restaurant"""
         restaurant_data = restaurantNS.payload
 
-        category_data = restaurant_data.pop('category_id', None)
-        if category_data:
-            category = Category.query.filter_by(name=category_data['name']).first()
-            if category is None:
-                category = Category(name=category_data['name'])
-                db.session.add(category)
-                db.session.commit()
-            restaurant_data['category_id'] = category.id
+        # Проверка, что category_id существует в базе данных
+        category_id = restaurant_data.get('category_id')
+        category = Category.query.get(category_id)
+        if category is None:
+            restaurantNS.abort(400, 'Недопустимый category_id. Категория не существует.')
 
+        # Если category_id существует, создаем новый ресторан
         restaurant = Restaurant(**restaurant_data)
         db.session.add(restaurant)
         db.session.commit()
@@ -92,19 +84,29 @@ class RestaurantResource(Resource):
         restaurant = Restaurant.query.filter_by(id=id).first()
         if not restaurant:
             restaurantNS.abort(404, 'Ресторан не найден')
+
         data = restaurant_schema.load(request.get_json())
+
+        # Проверка, что category_id существует в базе данных
+        category_id = data['category_id']
+        category = Category.query.get(category_id)
+        if category is None:
+            restaurantNS.abort(400, 'Недопустимый category_id. Категория не существует.')
+
+        # Если category_id существует, обновляем остальные поля
         restaurant.name = data['name']
         restaurant.address = data['description']
         restaurant.picture = data['picture']
         restaurant.price = data['price']
         restaurant.star = data['star']
         restaurant.tableCount = data['tableCount']
-        restaurant.cat_id = data['cat_id']
+        restaurant.category_id = category_id  # Устанавливаем category_id после проверки
         db.session.commit()
+
         return restaurant_schema.dump(restaurant), 200
 
     @api.doc(responses={
-        200: 'Успешный DELETE-запрос, ресторан удален',
+        200: 'Успешный DELETE-запрос, категория удалена',
         400: 'Некорректный запрос',
         404: 'Ресторан не найден'
     })

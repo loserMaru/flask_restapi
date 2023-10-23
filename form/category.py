@@ -1,4 +1,7 @@
 import os
+
+import sqlalchemy
+
 from extensions.flask_restx_extension import categoryNS
 from models import Category
 from flask import request
@@ -77,19 +80,23 @@ class CategoryResource(Resource):
         return category.to_dict(), 200
 
     @api.doc(responses={
-        204: 'Успешный DELETE-запрос, категория удалена',
+        200: 'Успешный DELETE-запрос, категория удалена',
+        400: 'Некорректный запрос',
         404: 'Категория не найдена'
     })
     @categoryNS.doc(security='jwt')
     def delete(self, id):
         """Delete category by ID"""
-        category = Category.query.get(id)
+        category = Category.query.filter_by(id=id).first()
         if not category:
             api.abort(404, message='Категория с id {} не найдена'.format(id))
-        db.session.delete(category)
-        db.session.commit()
-        return {'result': 'success'}, 204
-
+        try:
+            db.session.delete(category)
+            db.session.commit()
+            return {'msg': 'Категория с id {} была удалена'.format(id)}, 200
+        except sqlalchemy.exc.IntegrityError as e:
+            db.session.rollback()
+            return {'msg': 'Ошибка.'}, 400
 
 @categoryNS.doc(security='jwt')
 class UploadCategoryPic(Resource):

@@ -109,7 +109,7 @@ class Restaurant(db.Model):
     price = db.Column(db.Float(), nullable=False)
     star = db.Column(db.Float(), nullable=False)
     tableCount = db.Column(db.Integer(), nullable=False)
-    category_id = db.Column(db.Integer(), db.ForeignKey('category.id'), nullable=False)
+    category_id = db.Column(db.Integer(), db.ForeignKey('category.id'), nullable=True)
     category = db.relationship('Category', backref='restaurants')
 
     def to_dict(self):
