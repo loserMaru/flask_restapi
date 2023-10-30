@@ -20,7 +20,7 @@ reservation_model = reservationNS.model('Reservation', {
     'number': fields.String(required=True),
     'name': fields.String(required=True),
     'price': fields.Float(required=True),
-    'status': fields.Boolean,
+    'status': fields.String(default='waiting', required=True),
     'picture': fields.String(required=True),
     'user_id': fields.Integer(required=True),
     'restaurant_id': fields.Integer(required=True),
