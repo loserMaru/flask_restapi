@@ -77,7 +77,7 @@ class Reservation(db.Model):
     number = db.Column(db.String(255), nullable=False)
     name = db.Column(db.String(255), nullable=False)
     price = db.Column(db.Float(), nullable=False)
-    status = db.Column(db.Boolean())
+    status = db.Column(db.String(45), nullable=False)
     picture = db.Column(db.String(255))
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
     restaurant_id = db.Column(db.Integer, db.ForeignKey('restaurant.id'), nullable=False)
