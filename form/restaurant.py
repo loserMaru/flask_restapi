@@ -1,5 +1,5 @@
 import sqlalchemy
-from flask import request
+from flask import request, jsonify
 from flask_restx import fields, Resource
 
 from extensions import api, db, jwt_required_class
@@ -32,7 +32,18 @@ class RestaurantListResource(Resource):
     def get(self):
         """Get a list of restaurants"""
         restaurants = Restaurant.query.all()
-        return restaurants, 200
+
+        # Обновление среднего рейтинга для каждого ресторана
+        for restaurant in restaurants:
+            restaurant.star = restaurant.calculate_average_rating()
+
+        db.session.commit()  # Сохранение изменений в базе данных
+
+        # Преобразование объектов в словари и возврат списка ресторанов
+        restaurants_data = [restaurant.to_dict() for restaurant in restaurants]
+        print(restaurants_data)
+
+        return restaurants_data, 200
 
     @api.doc(responses={
         201: 'Успешный POST-запрос, создание нового ресторана',

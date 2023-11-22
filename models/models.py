@@ -1,3 +1,4 @@
+from sqlalchemy import func
 from sqlalchemy.orm import backref
 
 from extensions.database_extension import db
@@ -111,6 +112,10 @@ class Restaurant(db.Model):
     tableCount = db.Column(db.Integer(), nullable=False)
     category_id = db.Column(db.Integer(), db.ForeignKey('category.id'), nullable=True)
     category = db.relationship('Category', backref='restaurants')
+
+    def calculate_average_rating(self):
+        average_rating = db.session.query(func.avg(Rating.rating)).filter_by(restaurant_id=self.id).scalar()
+        return average_rating if average_rating is not None else 0.0
 
     def to_dict(self):
         return {
