@@ -41,8 +41,6 @@ class RestaurantListResource(Resource):
 
         # Преобразование объектов в словари и возврат списка ресторанов
         restaurants_data = [restaurant.to_dict() for restaurant in restaurants]
-        print(restaurants_data)
-
         return restaurants_data, 200
 
     @api.doc(responses={
