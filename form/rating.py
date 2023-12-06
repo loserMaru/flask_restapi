@@ -1,3 +1,5 @@
+from flask_jwt_extended import get_jwt_identity
+
 from extensions import ratingNS, api, db, jwt_required_class
 from models.models import Rating, User, Restaurant
 from schemas import RatingSchema
@@ -23,30 +25,29 @@ class RatingResourceList(Resource):
     @ratingNS.doc(security='jwt')
     def get(self):
         """Get a list of ratings"""
-        ratings = Rating.query.all()
+        user_id = get_jwt_identity().get('id')
+        ratings = Rating.query.filter_by(user_id=user_id).all()
         return ratings, 200
 
     @api.doc(responses={
         201: 'Успешный POST-запрос, создание нового ресурса',
         400: 'Некорректный запрос'
     })
-    @ratingNS.expect(rating_model)
+    @ratingNS.expect(rating_model)  # Используем модель для запроса
     @ratingNS.marshal_with(rating_model, code=201)
     @ratingNS.doc(security='jwt')
     def post(self):
         """Create a new rating"""
+        user_id = get_jwt_identity().get('id')
         data = api.payload
-        user_id = data['user_id']
+
         restaurant_id = data['restaurant_id']
         rating_value = data['rating']
 
-        # Check if the user and restaurant exist
-        user = User.query.get(user_id)
         restaurant = Restaurant.query.get(restaurant_id)
-        if not user or not restaurant:
-            api.abort(404, 'User or restaurant not found')
+        if not restaurant:
+            api.abort(404, 'Restaurant not found')
 
-        # Check if the rating already exists for the user and restaurant
         existing_rating = Rating.query.filter_by(user_id=user_id, restaurant_id=restaurant_id).first()
         if existing_rating:
             existing_rating.rating = rating_value

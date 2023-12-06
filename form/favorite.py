@@ -1,3 +1,4 @@
+from flask_jwt_extended import get_jwt_identity
 from flask_restx import fields, Resource
 from sqlalchemy.exc import IntegrityError
 from flask import request
@@ -26,7 +27,8 @@ class FavoriteResourceList(Resource):
     @favoriteNS.marshal_list_with(favorite_model)
     def get(self):
         """Get list of favorite restaurants"""
-        favorites = Favorite.query.all()
+        user_id = get_jwt_identity().get('id')
+        favorites = Favorite.query.filter_by(user_id=user_id).all()
         return favorites, 200
 
     @api.doc(responses={
