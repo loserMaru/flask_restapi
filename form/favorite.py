@@ -38,8 +38,19 @@ class FavoriteResourceList(Resource):
     def post(self):
         """Create new favorite restaurant"""
         data = request.json
-        favorite = Favorite(user_id=data.get('user_id'),
-                            restaurant_id=data.get('restaurant_id'))
+        user_id = data.get('user_id')
+        restaurant_id = data.get('restaurant_id')
+
+        # Проверяем, существует ли уже запись об избранном ресторане для данного пользователя
+        existing_favorite = Favorite.query.filter_by(user_id=user_id, restaurant_id=restaurant_id).first()
+
+        if existing_favorite:
+            # Если запись уже существует, возвращаем ошибку
+            return {'msg': 'Ресторан уже в избранном'}, 400
+
+        # Создаем новую запись об избранном ресторане
+        favorite = Favorite(user_id=user_id, restaurant_id=restaurant_id)
+
         try:
             db.session.add(favorite)
             db.session.commit()
