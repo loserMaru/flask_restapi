@@ -97,16 +97,40 @@ class FavoriteResource(Resource):
             db.session.rollback()
             return {'msg': 'Ошибка сохранения в базу данных. Неверные внешние ключи'}, 400
 
+    # @api.doc(responses={
+    #     200: 'Успешный DELETE-запрос, ресурс удален',
+    #     404: 'Ресурс не найден'
+    # })
+    # @favoriteNS.doc(security='jwt')
+    # def delete(self, id):
+    #     """Delete favorite restaurant by id"""
+    #     favorite = Favorite.query.filter_by(id=id).first()
+    #     if not favorite:
+    #         favoriteNS.abort(404, 'Избранное не найдено')
+    #     db.session.delete(favorite)
+    #     db.session.commit()
+    #     return {'msg': 'Удален из избранного'}, 200
+
     @api.doc(responses={
         200: 'Успешный DELETE-запрос, ресурс удален',
         404: 'Ресурс не найден'
     })
     @favoriteNS.doc(security='jwt')
     def delete(self, id):
-        """Delete favorite restaurant by id"""
-        favorite = Favorite.query.filter_by(id=id).first()
+        """Delete favorite restaurant by restaurant_id"""
+        current_user_id = get_jwt_identity().get('id')
+
+        # Поиск избранного по restaurant_id и user_id
+        favorite = Favorite.query.filter_by(restaurant_id=id, user_id=current_user_id).first()
+
         if not favorite:
             favoriteNS.abort(404, 'Избранное не найдено')
+
+        # Проверка, что пользователь удаляет свой собственный ресурс
+        if favorite.user_id != current_user_id:
+            favoriteNS.abort(403, 'Доступ запрещен')
+
         db.session.delete(favorite)
         db.session.commit()
+
         return {'msg': 'Удален из избранного'}, 200
