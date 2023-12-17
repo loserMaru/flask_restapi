@@ -10,12 +10,17 @@ class User(db.Model):
     password = db.Column(db.String(255), nullable=False)
     email = db.Column(db.String(255), unique=True, nullable=False)
     role = db.Column(db.String(255), nullable=False)
+    restaurant_id = db.Column(db.Integer, db.ForeignKey('restaurant.id'), nullable=True)
+
+    # Добавляем отношение к ресторану, если это необходимо
+    restaurant = db.relationship('Restaurant', backref='moderators', foreign_keys=[restaurant_id])
 
     def to_dict(self):
         return {
             'id': self.id,
             'email': self.email,
-            'role': self.role
+            'role': self.role,
+            'restaurant_id': self.restaurant_id
         }
 
 
