@@ -1,6 +1,7 @@
 from datetime import datetime
 
 from flask import request, jsonify
+from flask_cors import cross_origin
 from flask_jwt_extended import get_jwt_identity
 from flask_restx import Resource, fields
 from sqlalchemy.exc import IntegrityError
@@ -38,6 +39,7 @@ class ReservationListResource(Resource):
     def get(self):
         """Get a list of reservations"""
         current_user = get_jwt_identity()
+        user_id = current_user.get('id')
         role = current_user.get('role')
         restaurant_id = current_user.get('restaurant_id')
 
@@ -47,11 +49,12 @@ class ReservationListResource(Resource):
             reservations = Reservation.query.filter_by(restaurant_id=restaurant_id).all()
         else:
             # Если не модератор или у модератора нет ресторана, получаем все бронирования
-            reservations = Reservation.query.all()
+            reservations = Reservation.query.filter_by(user_id=user_id).all()
 
         # Преобразование объектов в словари и возврат списка бронирований
         reservations_data = [reservation.to_dict() for reservation in reservations]
         return reservations_data, 200
+
     @api.doc(responses={
         201: 'Успешный POST-запрос, объект создан',
         400: 'Неверные данные'})

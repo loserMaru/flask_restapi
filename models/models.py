@@ -95,7 +95,7 @@ class Reservation(db.Model):
         return {
             'id': self.id,
             'day': self.day,
-            'time': self.time,
+            "time": self.time.strftime("%H:%M:%S"),
             'number': self.number,
             'name': self.name,
             'price': self.price,
